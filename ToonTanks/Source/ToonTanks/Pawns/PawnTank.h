@@ -38,6 +38,20 @@ private:
     USpringArmComponent* SpringArm = nullptr;
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
     UCameraComponent* Camera = nullptr;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+    float MoveSpeed = 600.0f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+    float RotateSpeed = 200.0f;
+    
+    FVector MoveDirection;
+    FQuat RotationDirection;
+    
+    void CalculateMoveInput(float Value);
+    void CalculateRotateInput(float Value);
+    
+    void Move();
+    void Rotate();
     
 protected:
 
