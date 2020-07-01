@@ -20,6 +20,8 @@ public:
 	// Sets default values for this pawn's properties
 	APawnBase();
 	
+	void PawnDestroyed();
+	
 private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))

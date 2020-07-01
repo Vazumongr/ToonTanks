@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "ToonTanks/Actors/ProjectileBase.h"
+#include "Windows/LiveCoding/Private/External/LC_Process.h"
 
 // Sets default values
 APawnBase::APawnBase()
@@ -28,6 +29,11 @@ APawnBase::APawnBase()
 	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Projectile Spawn Point"));
 	ProjectileSpawnPoint->SetupAttachment((TurretMesh));
 
+}
+
+void APawnBase::PawnDestroyed()
+{
+	HandleDestruction();
 }
 
 void APawnBase::RotateTurret(FVector LookAtTarget)
