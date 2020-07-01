@@ -30,4 +30,15 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* ProjectileSpawnPoint;
 
+protected:
+
+	// Rotate the turret
+	void RotateTurret(FVector LookAtTarget);
+
+	// Create and launch the projectile
+	void Fire();
+
+	// Handle the destruction. Virtual because it will be overriden
+	virtual void HandleDestruction();
+
 };
