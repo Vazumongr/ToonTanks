@@ -29,7 +29,7 @@ void APawnTurret::CheckFireCondition()
 	if(ReturnDistanceToPlayer() <= FireRange)
 	{
 		// TODO attack the player
-		UE_LOG(LogTemp, Warning, TEXT("FIRE"));
+		Fire();
 	}
 }
 
@@ -41,8 +41,21 @@ float APawnTurret::ReturnDistanceToPlayer() const
 	return Distance;
 }
 
+void APawnTurret::HandleDestruction()
+{
+	Super::HandleDestruction();
+	Destroy();
+}
+
 // Called every frame
 void APawnTurret::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if(!PlayerPawn || ReturnDistanceToPlayer() > FireRange)
+	{
+		return;
+	}
+	RotateTurret(PlayerPawn->GetActorLocation());
+	
 }

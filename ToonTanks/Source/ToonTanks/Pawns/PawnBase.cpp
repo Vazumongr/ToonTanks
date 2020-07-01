@@ -3,6 +3,7 @@
 
 #include "PawnBase.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 APawnBase::APawnBase()
@@ -32,11 +33,19 @@ void APawnBase::RotateTurret(FVector LookAtTarget)
 {
 	// Update Turretmesh rotation to face towards the LookAtTarget passed in from the child class.
 	// TurretMesh->SetWorldRotation()...
+
+	// Find the rotation value to look at (the FRotator)
+	FVector StartLocation = TurretMesh->GetComponentLocation();
+	FRotator TurretRotation = UKismetMathLibrary::FindLookAtRotation(StartLocation, FVector(LookAtTarget.X, LookAtTarget.Y, TurretMesh->GetComponentLocation().Z));
+
+	// Rotate the turret to match that FRotator
+	TurretMesh->SetWorldRotation(TurretRotation);
 }
 
 void APawnBase::Fire()
 {
 	// Get ProjectileSpawnPoint Location && Rotation -> Spawn Projectile class at location towards rotation
+	UE_LOG(LogTemp, Warning, TEXT("FIRE"));
 }
 
 void APawnBase::HandleDestruction()
