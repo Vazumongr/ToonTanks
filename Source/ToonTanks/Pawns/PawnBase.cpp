@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "ToonTanks/Actors/ProjectileBase.h"
+#include "ToonTanks/GameModes/TankGameModeBase.h"
 #include "Windows/LiveCoding/Private/External/LC_Process.h"
 
 // Sets default values
@@ -65,6 +66,18 @@ void APawnBase::Fire()
 
 void APawnBase::HandleDestruction()
 {
+	/*
+	UWorld* World = GetWorld();
+	ATankGameModeBase* GameMode = nullptr;
+	if(World!=nullptr)
+	{
+		GameMode = Cast<ATankGameModeBase>(World->GetAuthGameMode());
+	}
+	if(GameMode!=nullptr)
+	{
+		GameMode->AddScore(this,this);
+	}
+	*/
 	// Universal functionality ---
 	// Play death effects particles, sound, camera shake, etc.
 	//

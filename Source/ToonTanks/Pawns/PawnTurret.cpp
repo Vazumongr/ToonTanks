@@ -2,6 +2,7 @@
 
 
 #include "PawnTurret.h"
+
 #include "Kismet/GameplayStatics.h"
 #include "PawnTank.h"
 
@@ -29,7 +30,7 @@ void APawnTurret::CheckFireCondition()
 	if(ReturnDistanceToPlayer() <= FireRange)
 	{
 		// TODO attack the player
-		Fire();
+		//Fire();
 	}
 }
 

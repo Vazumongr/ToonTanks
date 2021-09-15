@@ -30,9 +30,14 @@ private:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	APawnTank* PlayerTank;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Scoring", meta = (AllowPrivateAccess = "true"))
+	TMap<TSubclassOf<AActor>, float> TargetValues;
 	
 	void HandleGameStart();
 	void HandleGameOver(bool PlayerWon);
+
+	void AddScore(AActor* KilledActor);
 
 	int32 GetTargetTurretCount();
 	
