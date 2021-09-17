@@ -12,6 +12,7 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 	void AddScore(float InScore);
+	FORCEINLINE float GetScore() const { return Score; }
 
 
 private:

@@ -30,6 +30,8 @@ private:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	APawnTank* PlayerTank;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	class ATTPlayerController* PlayerController;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Scoring", meta = (AllowPrivateAccess = "true"))
 	TMap<TSubclassOf<AActor>, float> TargetValues;
@@ -40,6 +42,8 @@ private:
 	void AddScore(AActor* KilledActor);
 
 	int32 GetTargetTurretCount();
+
+	void AddPlayerScoreToLb();
 	
 protected:
 	virtual void BeginPlay() override;

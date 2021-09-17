@@ -5,6 +5,7 @@
 #include "ToonTanks/PlayerStates/TTPlayerState.h"
 
 #include "aws/core/Aws.h"
+#include "aws/core/auth/AWSCredentialsProvider.h"
 #include "aws/core/utils/Outcome.h" 
 #include "aws/dynamodb/DynamoDBClient.h"
 #include "aws/dynamodb/model/AttributeDefinition.h"
@@ -15,6 +16,7 @@
 #include "aws/dynamodb/model/ScanRequest.h"
 #include "aws/dynamodb/model/ListTablesRequest.h"
 #include "aws/dynamodb/model/ListTablesResult.h"
+#include "aws/dynamodb/model/DescribeEndpointsRequest.h"
 
 void AMainMenuGameMode::SetPlayerStateUserName(FString UserName, APlayerState* InState)
 {
@@ -36,38 +38,30 @@ void AMainMenuGameMode::BeginPlay()
 
 void AMainMenuGameMode::MakeTable()
 {
-	const std::string USAGE = "\n" \
-        "Usage:\n"
-        "    create_table <table> <optional:region>\n\n"
-        "Where:\n"
-        "    table - the table to create\n"
-        "    region- optional region\n\n"
-        "Example:\n"
-        "    create_table HelloTable us-west-2\n";
-
-    FString Message = FString(USAGE.c_str());
-    AddOnScreenMessage(Message);
-    
-/*
-    if (argc < 2)
-    {
-        std::cout << USAGE;
-        return 1;
-    }
-*/
     Aws::SDKOptions options;
 
     Aws::InitAPI(options);
     {
         const Aws::String table("HelloTable");
-        const Aws::String region("us-west-2");
+        const Aws::String region("us-east-2");
+        
+        Aws::Auth::EnvironmentAWSCredentialsProvider Prov;
+        Aws::Auth::AWSCredentials Creds = Prov.GetAWSCredentials();
+        FString SKey = Creds.GetAWSSecretKey().c_str();
+        FString AKey = Creds.GetAWSAccessKeyId().c_str();
+
+        AddOnScreenMessage(TEXT("SKey:"));
+        AddOnScreenMessage(SKey);
+        AddOnScreenMessage(TEXT("AKey:"));
+        AddOnScreenMessage(AKey);
 
         // snippet-start:[dynamodb.cpp.create_table.code]
         Aws::Client::ClientConfiguration clientConfig;
 	    Client = clientConfig;
-	    
-        if (!region.empty())
-            clientConfig.region = region;
+        //if (!region.empty())
+        Client.region = region;
+
+        UE_LOG(LogTemp, Warning, TEXT("Region: %s"), *FString(Client.region.c_str()));
 	    
         Aws::DynamoDB::DynamoDBClient dynamoClient(Client);
 
@@ -201,6 +195,7 @@ void AMainMenuGameMode::ListTables()
     Aws::InitAPI(options);
     {
         Aws::Client::ClientConfiguration clientConfig;
+        
         Aws::DynamoDB::DynamoDBClient dynamoClient(Client);
 
         Aws::DynamoDB::Model::ListTablesRequest ltr;
