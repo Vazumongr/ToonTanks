@@ -14,7 +14,43 @@
 
 ATankGameModeBase::ATankGameModeBase()
 {
-    
+    Http = &FHttpModule::Get();
+}
+
+void ATankGameModeBase::MyHttpCall()
+{
+    TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Http->CreateRequest();
+    Request->OnProcessRequestComplete().BindUObject(this, &ATankGameModeBase::OnResponseReceived);
+    //This is the url on which to process the request
+    Request->SetURL("https://httpbin.org/anything");
+    Request->SetVerb("GET");
+    Request->SetHeader(TEXT("User-Agent"), "X-UnrealEngine-Agent");
+    Request->SetHeader("Content-Type", TEXT("application/json"));
+    Request->ProcessRequest();
+}
+
+
+void ATankGameModeBase::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+{
+    UE_LOG(LogHttp, Warning, TEXT("Response Received..."));
+    TSharedPtr<FJsonObject> JsonObject;
+    TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
+
+    //Deserialize the json data given Reader and the actual object to deserialize
+    if (FJsonSerializer::Deserialize(Reader, JsonObject))
+    {
+        //Get the value of the json object by field name
+        //int32 recievedInt = JsonObject->GetIntegerField("customInt");
+        TMap<FString, TSharedPtr<FJsonValue>> Values = JsonObject->Values;
+        for (const TPair<FString, TSharedPtr<FJsonValue>>& pair : Values)
+        {
+            FString JsonPair = FString::Printf(TEXT("%s: %s"), *pair.Key, *pair.Value->AsString());
+            UE_LOG(LogHttp, Warning, TEXT("JsonPair: %s"), *JsonPair);
+        }
+        UE_LOG(LogHttp, Warning, TEXT("Response: %s"), *Response->GetContentAsString());
+        //Output it to the engine
+        //GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Green, FString::FromInt(recievedInt));
+    }
 }
 
 void ATankGameModeBase::BeginPlay()
@@ -25,8 +61,8 @@ void ATankGameModeBase::BeginPlay()
 
     HandleGameStart();
     
+    MyHttpCall();
     Super::BeginPlay();
-    
 }
 
 void ATankGameModeBase::ActorDied(AActor* DeadActor)
@@ -81,7 +117,7 @@ void ATankGameModeBase::HandleGameOver(bool PlayerWon)
     GameOver(PlayerWon);
     float PlayersScore = PlayerController->GetScore();
     UE_LOG(LogTemp, Warning, TEXT("Score: %f"), PlayersScore);
-    AddPlayerScoreToLb();
+    AddPlayerScoreToLb(PlayersScore);
 }
 
 int32 ATankGameModeBase::GetTargetTurretCount()
@@ -93,45 +129,32 @@ int32 ATankGameModeBase::GetTargetTurretCount()
     return TurretActors.Num();
 }
 
-void ATankGameModeBase::AddPlayerScoreToLb()
+void ATankGameModeBase::AddPlayerScoreToLb(float PlayersScore)
 {
     Aws::SDKOptions options;
 
     Aws::InitAPI(options);
     {
         
-        const Aws::String table("HelloTable");
+        const Aws::String score(std::to_string(PlayersScore).c_str());
+        const Aws::String table("Scores");
         const Aws::String region("us-east-2");
-        const Aws::String name("PlayerOne");
+        const Aws::String name("PlayerTwo");
 
         Aws::Client::ClientConfiguration clientConfig;
         clientConfig.region = region;
         Aws::DynamoDB::DynamoDBClient dynamoClient(clientConfig);
 
-        Aws::DynamoDB::Model::PutItemRequest pir;
-        pir.SetTableName(table);
+        Aws::DynamoDB::Model::PutItemRequest PutItemRequest;
+        PutItemRequest.SetTableName(table);
 
-        Aws::DynamoDB::Model::AttributeValue av;
-        av.SetS(name);
-        pir.AddItem("Name", av);
-/*
-        for (int x = 3; x < argc; x++)
-        {
-            const Aws::String arg(argv[x]);
-            const Aws::Vector<Aws::String>& flds = Aws::Utils::StringUtils::Split(arg, '=');
-            if (flds.size() == 2)
-            {
-                Aws::DynamoDB::Model::AttributeValue val;
-                val.SetS(flds[1]);
-                pir.AddItem(flds[0], val);
-            }
-            else
-            {
-                return;
-            }
-        }
-*/
-        const Aws::DynamoDB::Model::PutItemOutcome result = dynamoClient.PutItem(pir);
+        Aws::DynamoDB::Model::AttributeValue AttributeValue;
+        AttributeValue.SetS(name);
+        PutItemRequest.AddItem("Username", AttributeValue);
+        AttributeValue.SetN(score);
+        PutItemRequest.AddItem("Score", AttributeValue);
+        
+        const Aws::DynamoDB::Model::PutItemOutcome result = dynamoClient.PutItem(PutItemRequest);
         if (!result.IsSuccess())
         {
             std::cout << result.GetError().GetMessage() << std::endl;

@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "Runtime/Online/HTTP/Public/Http.h"
+
 #include "TankGameModeBase.generated.h"
 
 class APawnTurret;
@@ -16,6 +18,13 @@ class TOONTANKS_API ATankGameModeBase : public AGameModeBase
 
 public:
 	ATankGameModeBase();
+
+	FHttpModule* Http;
+	
+	/*Assign this function to call when the GET request processes sucessfully*/
+	void OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+	
+	void MyHttpCall();
 	
 	void ActorDied(AActor* DeadActor);
 	
@@ -43,7 +52,7 @@ private:
 
 	int32 GetTargetTurretCount();
 
-	void AddPlayerScoreToLb();
+	void AddPlayerScoreToLb(float PlayersScore);
 	
 protected:
 	virtual void BeginPlay() override;
