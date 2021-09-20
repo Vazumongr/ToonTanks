@@ -24,7 +24,8 @@ public:
 	/*Assign this function to call when the GET request processes sucessfully*/
 	void OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 	
-	void MyHttpCall();
+	void ScanLeaderboard();
+	void AddScoreToLeaderboard(float PlayersScore);
 	
 	void ActorDied(AActor* DeadActor);
 	

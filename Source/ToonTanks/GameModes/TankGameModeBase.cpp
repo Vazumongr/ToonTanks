@@ -17,15 +17,35 @@ ATankGameModeBase::ATankGameModeBase()
     Http = &FHttpModule::Get();
 }
 
-void ATankGameModeBase::MyHttpCall()
+void ATankGameModeBase::ScanLeaderboard()
 {
     TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Http->CreateRequest();
     Request->OnProcessRequestComplete().BindUObject(this, &ATankGameModeBase::OnResponseReceived);
     //This is the url on which to process the request
-    Request->SetURL("https://httpbin.org/anything");
+    Request->SetURL("https://9bkd1wd39i.execute-api.us-east-2.amazonaws.com/scores");
     Request->SetVerb("GET");
     Request->SetHeader(TEXT("User-Agent"), "X-UnrealEngine-Agent");
     Request->SetHeader("Content-Type", TEXT("application/json"));
+    Request->ProcessRequest();
+}
+
+void ATankGameModeBase::AddScoreToLeaderboard(float PlayersScore)
+{
+    TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
+    JsonObject->SetStringField("Username", "PlayerThree");
+    JsonObject->SetNumberField("Score", PlayersScore);
+    FString OutputString;
+    TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
+    FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
+
+    TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Http->CreateRequest();
+    Request->OnProcessRequestComplete().BindUObject(this, &ATankGameModeBase::OnResponseReceived);
+    //This is the url on which to process the request
+    Request->SetURL("https://9bkd1wd39i.execute-api.us-east-2.amazonaws.com/scores");
+    Request->SetVerb("PUT");
+    Request->SetHeader(TEXT("User-Agent"), "X-UnrealEngine-Agent");
+    Request->SetHeader("Content-Type", TEXT("application/json"));
+    Request->SetContentAsString(OutputString);
     Request->ProcessRequest();
 }
 
@@ -39,8 +59,6 @@ void ATankGameModeBase::OnResponseReceived(FHttpRequestPtr Request, FHttpRespons
     //Deserialize the json data given Reader and the actual object to deserialize
     if (FJsonSerializer::Deserialize(Reader, JsonObject))
     {
-        //Get the value of the json object by field name
-        //int32 recievedInt = JsonObject->GetIntegerField("customInt");
         TMap<FString, TSharedPtr<FJsonValue>> Values = JsonObject->Values;
         for (const TPair<FString, TSharedPtr<FJsonValue>>& pair : Values)
         {
@@ -48,8 +66,6 @@ void ATankGameModeBase::OnResponseReceived(FHttpRequestPtr Request, FHttpRespons
             UE_LOG(LogHttp, Warning, TEXT("JsonPair: %s"), *JsonPair);
         }
         UE_LOG(LogHttp, Warning, TEXT("Response: %s"), *Response->GetContentAsString());
-        //Output it to the engine
-        //GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Green, FString::FromInt(recievedInt));
     }
 }
 
@@ -61,7 +77,7 @@ void ATankGameModeBase::BeginPlay()
 
     HandleGameStart();
     
-    MyHttpCall();
+    ScanLeaderboard();
     Super::BeginPlay();
 }
 
@@ -117,7 +133,7 @@ void ATankGameModeBase::HandleGameOver(bool PlayerWon)
     GameOver(PlayerWon);
     float PlayersScore = PlayerController->GetScore();
     UE_LOG(LogTemp, Warning, TEXT("Score: %f"), PlayersScore);
-    AddPlayerScoreToLb(PlayersScore);
+    AddScoreToLeaderboard(PlayersScore);
 }
 
 int32 ATankGameModeBase::GetTargetTurretCount()
