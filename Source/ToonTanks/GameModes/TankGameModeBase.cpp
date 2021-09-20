@@ -66,14 +66,20 @@ void ATankGameModeBase::OnResponseReceived(FHttpRequestPtr Request, FHttpRespons
     FString OnScreenMessage = FString::Printf(TEXT("StatusCode: %i \n| Headers: %s \n| Content: %s"), ResponseCode, *HeaderString, *Content);
     GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Yellow, OnScreenMessage);
 
+    if(Response->GetHeader("Result-Type") != "scan")
+    {
+        return;
+    }
     //Deserialize the json data given Reader and the actual object to deserialize
     if (FJsonSerializer::Deserialize(Reader, JsonObject))
     {
         TMap<FString, TSharedPtr<FJsonValue>> Values = JsonObject->Values;
-        for (const TPair<FString, TSharedPtr<FJsonValue>>& pair : Values)
+        const TArray<TSharedPtr<FJsonValue>>& Items = JsonObject->GetArrayField("Items");
+        for(const TSharedPtr<FJsonValue>& JsonValuePtr : Items)
         {
-            FString JsonPair = FString::Printf(TEXT("%s: %s"), *pair.Key, *pair.Value->AsString());
-            UE_LOG(LogHttp, Warning, TEXT("JsonPair: %s"), *JsonPair);
+            FString Username = JsonValuePtr.Get()->AsObject()->GetStringField("Username");
+            float Score = JsonValuePtr.Get()->AsObject()->GetNumberField("Score");
+            UE_LOG(LogHttp, Warning, TEXT("Username: %s     Score: %f"), *Username, Score);
         }
     }
 }
