@@ -55,6 +55,22 @@ void ATankGameModeBase::OnResponseReceived(FHttpRequestPtr Request, FHttpRespons
     UE_LOG(LogHttp, Warning, TEXT("Response Received..."));
     TSharedPtr<FJsonObject> JsonObject;
     TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
+    int32 ResponseCode = Response->GetResponseCode();
+    TArray<FString> Headers = Response->GetAllHeaders();
+    FString Content = Response->GetContentAsString();
+
+    UE_LOG(LogHttp, Warning, TEXT("%i"), Headers.Num());
+
+    FString HeaderString;
+    for(FString& msg : Headers)
+    {
+        HeaderString.Append(msg);
+    }
+    
+    UE_LOG(LogHttp, Warning, TEXT("StatusCode: %i | Headers: %s | Content: %s"), ResponseCode, *HeaderString, *Content);
+
+    FString OnScreenMessage = FString::Printf(TEXT("StatusCode: %i \n| Headers: %s \n| Content: %s"), ResponseCode, *HeaderString, *Content);
+    GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Yellow, OnScreenMessage);
 
     //Deserialize the json data given Reader and the actual object to deserialize
     if (FJsonSerializer::Deserialize(Reader, JsonObject))
@@ -65,7 +81,6 @@ void ATankGameModeBase::OnResponseReceived(FHttpRequestPtr Request, FHttpRespons
             FString JsonPair = FString::Printf(TEXT("%s: %s"), *pair.Key, *pair.Value->AsString());
             UE_LOG(LogHttp, Warning, TEXT("JsonPair: %s"), *JsonPair);
         }
-        UE_LOG(LogHttp, Warning, TEXT("Response: %s"), *Response->GetContentAsString());
     }
 }
 
