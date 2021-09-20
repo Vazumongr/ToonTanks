@@ -53,7 +53,6 @@ private:
 
 	int32 GetTargetTurretCount();
 
-	void AddPlayerScoreToLb(float PlayersScore);
 	
 protected:
 	virtual void BeginPlay() override;

@@ -3,4 +3,3 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "aws/core/Aws.h"

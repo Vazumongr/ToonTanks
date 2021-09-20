@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "aws/dynamodb/DynamoDBClient.h"
 
 #include "MainMenuGameMode.generated.h"
 
@@ -19,13 +18,7 @@ public:
 
 	virtual void BeginPlay() override;
 
-	void MakeTable();
-	void ScanTable();
-	void ListTables();
-
 private:
 	void AddOnScreenMessage(const FString& Message);
-
-	Aws::Client::ClientConfiguration Client;
 
 };

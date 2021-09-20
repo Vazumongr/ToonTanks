@@ -1,12 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "TankGameModeBase.h"
 
-#include "aws/core/Aws.h"
-#include "aws/core/utils/Outcome.h" 
-#include "aws/dynamodb/DynamoDBClient.h"
-#include "aws/dynamodb/model/AttributeDefinition.h"
-#include "aws/dynamodb/model/PutItemRequest.h"
-#include "aws/dynamodb/model/PutItemResult.h"
 #include "ToonTanks/Pawns/PawnTank.h"
 #include "ToonTanks/Pawns/PawnTurret.h"
 #include "ToonTanks/Controllers/TTPlayerController.h"
@@ -160,43 +154,5 @@ int32 ATankGameModeBase::GetTargetTurretCount()
     return TurretActors.Num();
 }
 
-void ATankGameModeBase::AddPlayerScoreToLb(float PlayersScore)
-{
-    Aws::SDKOptions options;
-
-    Aws::InitAPI(options);
-    {
-        
-        const Aws::String score(std::to_string(PlayersScore).c_str());
-        const Aws::String table("Scores");
-        const Aws::String region("us-east-2");
-        const Aws::String name("PlayerTwo");
-
-        Aws::Client::ClientConfiguration clientConfig;
-        clientConfig.region = region;
-        Aws::DynamoDB::DynamoDBClient dynamoClient(clientConfig);
-
-        Aws::DynamoDB::Model::PutItemRequest PutItemRequest;
-        PutItemRequest.SetTableName(table);
-
-        Aws::DynamoDB::Model::AttributeValue AttributeValue;
-        AttributeValue.SetS(name);
-        PutItemRequest.AddItem("Username", AttributeValue);
-        AttributeValue.SetN(score);
-        PutItemRequest.AddItem("Score", AttributeValue);
-        
-        const Aws::DynamoDB::Model::PutItemOutcome result = dynamoClient.PutItem(PutItemRequest);
-        if (!result.IsSuccess())
-        {
-            std::cout << result.GetError().GetMessage() << std::endl;
-            FString ErrorMsg = FString::Printf(TEXT("Error: %s"), *FString(result.GetError().GetMessage().c_str()));
-            UE_LOG(LogTemp, Warning, TEXT("%s"), *ErrorMsg);
-            return;
-        }
-        UE_LOG(LogTemp, Warning, TEXT("Database Update Complete!"));
-        std::cout << "Done!" << std::endl;
-    }
-    Aws::ShutdownAPI(options);
-}
 
 
