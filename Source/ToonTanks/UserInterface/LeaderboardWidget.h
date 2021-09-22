@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+//#include "CoreMinimal.h"
+#include "ToonTanks/ToonTanks.h"
 #include "Blueprint/UserWidget.h"
 #include "Runtime/Online/HTTP/Public/Http.h"
 
@@ -49,8 +50,15 @@ class TOONTANKS_API ULeaderboardWidget : public UUserWidget
 	void ScanLeaderboardRequest();
 
 protected:
+
+	UFUNCTION(BlueprintCallable)
+	void SortUsersScores();
+	
 	UFUNCTION(BlueprintImplementableEvent)
 	void UpdateLeaderboardList();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void HideFields();
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<FUserScore> UsersScores;

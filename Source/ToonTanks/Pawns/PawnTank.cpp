@@ -20,13 +20,18 @@ void APawnTank::BeginPlay()
 {
 	Super::BeginPlay();
 	PlayerControllerRef = Cast<APlayerController>(GetController());
-	
 }
 
 void APawnTank::HandleDestruction()
 {
 	Super::HandleDestruction();
 	// Hide Player TODO - Create new function to handle this
+}
+
+void APawnTank::Fire()
+{
+	Super::Fire();
+	UE_LOG(LogTemp, Warning, TEXT("Firing!"));
 }
 
 // Called every frame

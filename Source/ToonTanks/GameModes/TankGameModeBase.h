@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+//#include "CoreMinimal.h"
+#include "ToonTanks/ToonTanks.h"
 #include "GameFramework/GameModeBase.h"
 #include "Runtime/Online/HTTP/Public/Http.h"
 
@@ -33,8 +34,15 @@ public:
 	void GameStart();
 	UFUNCTION(BlueprintImplementableEvent)
 	void GameOver(bool PlayerWon);
+	UFUNCTION(BlueprintImplementableEvent)
+	void ShowEndGameMenu(bool inPlayerWon);
 	
 private:
+
+	FHttpRequestPtr InsertRequest;
+	bool bDevTest = false;
+
+	bool bPlayerWon = false;
 
 	int32 TargetTurrets = 0;
 	

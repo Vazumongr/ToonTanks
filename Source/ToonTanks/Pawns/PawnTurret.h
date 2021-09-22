@@ -32,7 +32,8 @@ private:
 	
 	FTimerHandle FireRateTimerHandle;
 
-	APawnTank* PlayerPawn = nullptr;
+	UPROPERTY()
+	APawnTank* PlayerPawn;
 
 	void CheckFireCondition();
 

@@ -42,7 +42,7 @@ protected:
 	void RotateTurret(FVector LookAtTarget);
 
 	// Create and launch the projectile
-	void Fire();
+	virtual void Fire();
 
 	// Handle the destruction. Virtual because it will be overriden
 	virtual void HandleDestruction();

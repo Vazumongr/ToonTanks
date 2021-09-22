@@ -30,7 +30,7 @@ void APawnTurret::CheckFireCondition()
 	if(ReturnDistanceToPlayer() <= FireRange)
 	{
 		// TODO attack the player
-		//Fire();
+		Fire();
 	}
 }
 
@@ -38,7 +38,7 @@ float APawnTurret::ReturnDistanceToPlayer() const
 {
 	if(!PlayerPawn) { return 0.0f; }
 
-	float Distance = (PlayerPawn->GetActorLocation() - GetActorLocation()).Size();
+	const float Distance = (PlayerPawn->GetActorLocation() - GetActorLocation()).Size();
 	return Distance;
 }
 

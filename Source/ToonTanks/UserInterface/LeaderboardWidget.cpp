@@ -17,7 +17,24 @@ bool ULeaderboardWidget::Initialize()
 
 void ULeaderboardWidget::Setup()
 {
+	HideFields();
 	ScanLeaderboardRequest();
+	FString BuildOption;
+#if UE_BUILD_SHIPPING
+	BuildOption = "UE_BUILD_SHIPPING";
+#elif UE_BUILD_DEVELOPMENT_WITH_DEBUGGAME
+	BuildOption = "UE_BUILD_DEBUG";
+#elif UE_BUILD_TEST
+	BuildOption = "UE_BUILD_TEST";
+#elif UE_BUILD_SHIPPING_WITH_EDITOR
+	BuildOption = "UE_BUILD_SHIPPING_WITH_EDITOR";
+#elif UE_BUILD_DEVELOPMENT
+	BuildOption = "UE_BUILD_DEVELOPMENT";
+#endif
+	
+	UE_LOG(LogTemp, Warning, TEXT("BuildOption: %s"), *BuildOption);
+	BuildOption = FString("BuildOption: ").Append(BuildOption);
+	GEngine->AddOnScreenDebugMessage(0, 10.f, FColor::Emerald, BuildOption);
 }
 
 void ULeaderboardWidget::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
@@ -78,8 +95,9 @@ void ULeaderboardWidget::ProcessScanResponse(FHttpRequestPtr Request, FHttpRespo
 			float Score = JsonValuePtr.Get()->AsObject()->GetNumberField("Score");
 			UE_LOG(LogHttp, Warning, TEXT("Username: %s     Score: %f"), *Username, Score);
 			UsersScores.Add(FUserScore(Username,Score));
-			UpdateLeaderboardList();
 		}
+		SortUsersScores();
+		UpdateLeaderboardList();
 	}
 }
 
@@ -88,9 +106,29 @@ void ULeaderboardWidget::ScanLeaderboardRequest()
 	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Http->CreateRequest();
 	Request->OnProcessRequestComplete().BindUObject(this, &ULeaderboardWidget::OnResponseReceived);
 	//This is the url on which to process the request
-	Request->SetURL("https://9bkd1wd39i.execute-api.us-east-2.amazonaws.com/scores");
+	Request->SetURL(APILINK);
 	Request->SetVerb("GET");
 	Request->SetHeader(TEXT("User-Agent"), "X-UnrealEngine-Agent");
 	Request->SetHeader("Content-Type", TEXT("application/json"));
 	Request->ProcessRequest();
+}
+
+void ULeaderboardWidget::SortUsersScores()
+{
+	int8 i, j, min_idx;
+	FUserScore temp;
+	for(i = 0; i < UsersScores.Num(); i++)
+	{
+		min_idx = i;
+		for(j = i+1; j < UsersScores.Num(); j++)
+		{
+			if(UsersScores[j].Score < UsersScores[min_idx].Score)
+			{
+				min_idx = j;
+			}
+			temp = UsersScores[min_idx];
+			UsersScores[min_idx] = UsersScores[j];
+			UsersScores[j] = temp;
+		}
+	}
 }

@@ -45,7 +45,9 @@ private:
     FVector MoveDirection;
     FQuat RotationDirection;
 
+    UPROPERTY()
     APlayerController* PlayerControllerRef;
+    
     FHitResult TraceHitResult;
     
     void CalculateMoveInput(float Value);
@@ -59,6 +61,8 @@ protected:
     virtual void BeginPlay() override;
 
     virtual void HandleDestruction() override;
+
+    virtual void Fire() override;
 
 
 };

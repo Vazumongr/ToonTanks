@@ -5,6 +5,7 @@
 #include "ToonTanks/Pawns/PawnTurret.h"
 #include "ToonTanks/Controllers/TTPlayerController.h"
 #include "Kismet/GameplayStatics.h"
+#include "ToonTanks/GameInstances/TTGameInstance.h"
 
 ATankGameModeBase::ATankGameModeBase()
 {
@@ -16,7 +17,7 @@ void ATankGameModeBase::ScanLeaderboard()
     TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Http->CreateRequest();
     Request->OnProcessRequestComplete().BindUObject(this, &ATankGameModeBase::OnResponseReceived);
     //This is the url on which to process the request
-    Request->SetURL("https://9bkd1wd39i.execute-api.us-east-2.amazonaws.com/scores");
+    Request->SetURL(APILINK);
     Request->SetVerb("GET");
     Request->SetHeader(TEXT("User-Agent"), "X-UnrealEngine-Agent");
     Request->SetHeader("Content-Type", TEXT("application/json"));
@@ -26,7 +27,13 @@ void ATankGameModeBase::ScanLeaderboard()
 void ATankGameModeBase::AddScoreToLeaderboard(float PlayersScore)
 {
     TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
-    JsonObject->SetStringField("Username", "PlayerThree");
+
+    UTTGameInstance* GameInstance = Cast<UTTGameInstance>(GetGameInstance());
+    
+    if(GameInstance == nullptr) return;
+    
+    const FString PlayerUsername = GameInstance->GetPlayerUsername();
+    JsonObject->SetStringField("Username", PlayerUsername);
     JsonObject->SetNumberField("Score", PlayersScore);
     FString OutputString;
     TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
@@ -35,52 +42,22 @@ void ATankGameModeBase::AddScoreToLeaderboard(float PlayersScore)
     TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Http->CreateRequest();
     Request->OnProcessRequestComplete().BindUObject(this, &ATankGameModeBase::OnResponseReceived);
     //This is the url on which to process the request
-    Request->SetURL("https://9bkd1wd39i.execute-api.us-east-2.amazonaws.com/scores");
+    Request->SetURL(APILINK);
     Request->SetVerb("PUT");
     Request->SetHeader(TEXT("User-Agent"), "X-UnrealEngine-Agent");
     Request->SetHeader("Content-Type", TEXT("application/json"));
     Request->SetContentAsString(OutputString);
     Request->ProcessRequest();
+    InsertRequest = Request;
 }
 
 
 void ATankGameModeBase::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
 {
-    UE_LOG(LogHttp, Warning, TEXT("Response Received..."));
-    TSharedPtr<FJsonObject> JsonObject;
-    TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
-    int32 ResponseCode = Response->GetResponseCode();
-    TArray<FString> Headers = Response->GetAllHeaders();
-    FString Content = Response->GetContentAsString();
-
-    UE_LOG(LogHttp, Warning, TEXT("%i"), Headers.Num());
-
-    FString HeaderString;
-    for(FString& msg : Headers)
+    if(Request == InsertRequest)
     {
-        HeaderString.Append(msg);
-    }
-    
-    UE_LOG(LogHttp, Warning, TEXT("StatusCode: %i | Headers: %s | Content: %s"), ResponseCode, *HeaderString, *Content);
-
-    FString OnScreenMessage = FString::Printf(TEXT("StatusCode: %i \n| Headers: %s \n| Content: %s"), ResponseCode, *HeaderString, *Content);
-    GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Yellow, OnScreenMessage);
-
-    if(Response->GetHeader("Result-Type") != "scan")
-    {
-        return;
-    }
-    //Deserialize the json data given Reader and the actual object to deserialize
-    if (FJsonSerializer::Deserialize(Reader, JsonObject))
-    {
-        TMap<FString, TSharedPtr<FJsonValue>> Values = JsonObject->Values;
-        const TArray<TSharedPtr<FJsonValue>>& Items = JsonObject->GetArrayField("Items");
-        for(const TSharedPtr<FJsonValue>& JsonValuePtr : Items)
-        {
-            FString Username = JsonValuePtr.Get()->AsObject()->GetStringField("Username");
-            float Score = JsonValuePtr.Get()->AsObject()->GetNumberField("Score");
-            UE_LOG(LogHttp, Warning, TEXT("Username: %s     Score: %f"), *Username, Score);
-        }
+        UE_LOG(LogHttp, Warning, TEXT("Our insert finished!"));
+        ShowEndGameMenu(bPlayerWon);
     }
 }
 
@@ -93,6 +70,16 @@ void ATankGameModeBase::BeginPlay()
     HandleGameStart();
     
     ScanLeaderboard();
+
+    UTTGameInstance* GameInstance = Cast<UTTGameInstance>(GetGameInstance());
+    
+    if(GameInstance == nullptr) return;
+    
+    const FString PlayerUsername = GameInstance->GetPlayerUsername();
+    if(PlayerUsername == "DevTest")
+    {
+        bDevTest = true;
+    }
     Super::BeginPlay();
 }
 
@@ -107,7 +94,7 @@ void ATankGameModeBase::ActorDied(AActor* DeadActor)
     {
         DestroyedTurret->PawnDestroyed();
         AddScore(DeadActor);
-        if(--TargetTurrets <= 0)
+        if(--TargetTurrets <= 0 || bDevTest)
         {
             HandleGameOver(true);
         }
@@ -146,6 +133,7 @@ void ATankGameModeBase::HandleGameStart()
 void ATankGameModeBase::HandleGameOver(bool PlayerWon)
 {
     GameOver(PlayerWon);
+    bPlayerWon = PlayerWon;
     float PlayersScore = PlayerController->GetScore();
     UE_LOG(LogTemp, Warning, TEXT("Score: %f"), PlayersScore);
     AddScoreToLeaderboard(PlayersScore);

@@ -19,13 +19,17 @@ public:
 	// Sets default values for this component's properties
 	UHealthComponent();
 
+	UFUNCTION(BlueprintCallable)
+	float GetHealth() const { return Health; }
+
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health", meta = (AllowPrivateAccess = "true"))
 	float DefaultHealth = 100.0f;
 	float Health = 0.0f;
 
+	UPROPERTY()
 	AActor* Owner;
-
+	UPROPERTY()
 	ATankGameModeBase* GameModeRef;
 
 protected:
