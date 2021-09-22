@@ -44,10 +44,6 @@ void ULeaderboardWidget::OnResponseReceived(FHttpRequestPtr Request, FHttpRespon
 		ProcessScanResponse(Request, Response);
 	}
 	UE_LOG(LogHttp, Warning, TEXT("Response Received..."));
-	/*
-	TSharedPtr<FJsonObject> JsonObject;
-	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
-	*/
 	int32 ResponseCode = Response->GetResponseCode();
 	TArray<FString> Headers = Response->GetAllHeaders();
 	FString Content = Response->GetContentAsString();
@@ -64,20 +60,6 @@ void ULeaderboardWidget::OnResponseReceived(FHttpRequestPtr Request, FHttpRespon
 
 	FString OnScreenMessage = FString::Printf(TEXT("StatusCode: %i \n| Headers: %s \n| Content: %s"), ResponseCode, *HeaderString, *Content);
 	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Yellow, OnScreenMessage);
-	/*
-	//Deserialize the json data given Reader and the actual object to deserialize
-	if (FJsonSerializer::Deserialize(Reader, JsonObject))
-	{
-		TMap<FString, TSharedPtr<FJsonValue>> Values = JsonObject->Values;
-		const TArray<TSharedPtr<FJsonValue>>& Items = JsonObject->GetArrayField("Items");
-		for(const TSharedPtr<FJsonValue>& JsonValuePtr : Items)
-		{
-			FString Username = JsonValuePtr.Get()->AsObject()->GetStringField("Username");
-			float Score = JsonValuePtr.Get()->AsObject()->GetNumberField("Score");
-			UE_LOG(LogHttp, Warning, TEXT("Username: %s     Score: %f"), *Username, Score);
-		}
-	}
-	*/
 }
 
 void ULeaderboardWidget::ProcessScanResponse(FHttpRequestPtr Request, FHttpResponsePtr Response)
