@@ -65,6 +65,17 @@ void USignInWidget::SignInUser()
 	Username = UsernameTextBox->GetText().ToString();
 	Password = PasswordTextBox->GetText().ToString();
 
+	if(Username.Len() == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Please enter a username"));
+		return;
+	}
+	else if(Password.Len() == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Please enter a password"));
+		return;
+	}
+
 	FString URL = FString::Printf(TEXT("https://9bkd1wd39i.execute-api.us-east-2.amazonaws.com/users/%s"), *Username);
 	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Http->CreateRequest();
 	Request->OnProcessRequestComplete().BindUObject(this, &USignInWidget::OnResponseReceived);
