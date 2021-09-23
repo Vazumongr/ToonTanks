@@ -27,7 +27,12 @@ void ATTPlayerController::SetupInputComponent()
 
 void ATTPlayerController::OpenMenu()
 {
-	PauseMenuWidget = CreateWidget(this, PauseMenuClass);
+	if(PauseMenuWidget==nullptr)
+		PauseMenuWidget = CreateWidget(this, PauseMenuClass);
 	if(PauseMenuWidget != nullptr)
+	{
 		PauseMenuWidget->AddToViewport();
+		SetPause(true);
+	}
+		
 }
