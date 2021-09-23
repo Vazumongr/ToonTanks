@@ -3,8 +3,14 @@
 #include "Blueprint/UserWidget.h"
 #include "ToonTanks/PlayerStates/TTPlayerState.h"
 
+ATTPlayerController::ATTPlayerController()
+{
+	bShowMouseCursor = true;
+}
+
 void ATTPlayerController::Tick(float DeltaSeconds)
 {
+	Super::Tick(DeltaSeconds);
 	ATTPlayerState* TTPS = Cast<ATTPlayerState>(PlayerState);
 	FString Name = PlayerState->GetPlayerName();
 	FString Message = (FString::Printf(TEXT("%s score: %f"), *TTPS->UserName, Score));
@@ -34,5 +40,4 @@ void ATTPlayerController::OpenMenu()
 		PauseMenuWidget->AddToViewport();
 		SetPause(true);
 	}
-		
 }

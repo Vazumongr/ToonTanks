@@ -28,10 +28,21 @@ void APawnTank::HandleDestruction()
 	// Hide Player TODO - Create new function to handle this
 }
 
+// Called to bind functionality to input
+void APawnTank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	PlayerInputComponent->BindAxis("MoveForward", this, &APawnTank::CalculateMoveInput);
+	PlayerInputComponent->BindAxis("Turn", this, &APawnTank::CalculateRotateInput);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APawnTank::Fire);
+
+}
+
 void APawnTank::Fire()
 {
-	Super::Fire();
 	UE_LOG(LogTemp, Warning, TEXT("Firing!"));
+	Super::Fire();
 }
 
 // Called every frame
@@ -49,17 +60,6 @@ void APawnTank::Tick(float DeltaTime)
 		RotateTurret(HitLocation);
 	}
 	
-}
-
-// Called to bind functionality to input
-void APawnTank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	PlayerInputComponent->BindAxis("MoveForward", this, &APawnTank::CalculateMoveInput);
-	PlayerInputComponent->BindAxis("Turn", this, &APawnTank::CalculateRotateInput);
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APawnTank::Fire);
-
 }
 
 void APawnTank::CalculateMoveInput(float Value)

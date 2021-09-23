@@ -9,6 +9,8 @@ class TOONTANKS_API ATTPlayerController : public APlayerController
 	GENERATED_BODY()
 public:
 
+	ATTPlayerController();
+
 	virtual void Tick(float DeltaSeconds) override;
 
 	void AddScore(float InScore);
