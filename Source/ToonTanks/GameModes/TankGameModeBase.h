@@ -27,6 +27,7 @@ public:
 	
 	void ScanLeaderboard();
 	void AddScoreToLeaderboard(float PlayersScore);
+	void SetUsername();
 	
 	void ActorDied(AActor* DeadActor);
 	

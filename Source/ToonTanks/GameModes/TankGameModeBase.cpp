@@ -51,6 +51,19 @@ void ATankGameModeBase::AddScoreToLeaderboard(float PlayersScore)
     InsertRequest = Request;
 }
 
+void ATankGameModeBase::SetUsername()
+{
+    UTTGameInstance* GameInstance = Cast<UTTGameInstance>(GetGameInstance());
+    
+    if(GameInstance == nullptr) return;
+    
+    const FString PlayerUsername = GameInstance->GetPlayerUsername();
+    if(PlayerUsername == "DevTest")
+    {
+        bDevTest = true;
+    }
+}
+
 
 void ATankGameModeBase::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
 {
@@ -68,18 +81,9 @@ void ATankGameModeBase::BeginPlay()
     PlayerController = PlayerTank->GetController<ATTPlayerController>();
 
     HandleGameStart();
-    
     ScanLeaderboard();
-
-    UTTGameInstance* GameInstance = Cast<UTTGameInstance>(GetGameInstance());
+    SetUsername();
     
-    if(GameInstance == nullptr) return;
-    
-    const FString PlayerUsername = GameInstance->GetPlayerUsername();
-    if(PlayerUsername == "DevTest")
-    {
-        bDevTest = true;
-    }
     Super::BeginPlay();
 }
 
@@ -107,20 +111,12 @@ void ATankGameModeBase::AddScore(AActor* KilledActor)
     {
         return;
     }
-
     float* TargetScore = TargetValues.Find(KilledActor->GetClass());
-
     if(TargetScore == nullptr)
     {
         UE_LOG(LogTemp, Warning, TEXT("KilledActor class %s does not exist within the Target Score Table! Please fix inside of the game mode!"), *KilledActor->GetClass()->GetName());
         return;
     }
-
-    UE_LOG(LogTemp, Warning, TEXT("KilledActor class %s is found in the Target Score Table with a score of %d!"), *KilledActor->GetClass()->GetName(), *TargetScore);
-    FString Message = (FString::Printf(TEXT("KilledActor class %s is found in the Target Score Table with a score of %f!"), *KilledActor->GetClass()->GetName(), *TargetScore));
-    GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Yellow,Message);
-
-    //PlayerController = PlayerTank->GetController<ATTPlayerController>();
     if(PlayerController != nullptr)
         PlayerController->AddScore(*TargetScore);
 }

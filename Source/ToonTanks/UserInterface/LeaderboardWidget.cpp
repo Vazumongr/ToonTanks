@@ -19,22 +19,6 @@ void ULeaderboardWidget::Setup()
 {
 	HideFields();
 	ScanLeaderboardRequest();
-	FString BuildOption;
-#if UE_BUILD_SHIPPING
-	BuildOption = "UE_BUILD_SHIPPING";
-#elif UE_BUILD_DEVELOPMENT_WITH_DEBUGGAME
-	BuildOption = "UE_BUILD_DEBUG";
-#elif UE_BUILD_TEST
-	BuildOption = "UE_BUILD_TEST";
-#elif UE_BUILD_SHIPPING_WITH_EDITOR
-	BuildOption = "UE_BUILD_SHIPPING_WITH_EDITOR";
-#elif UE_BUILD_DEVELOPMENT
-	BuildOption = "UE_BUILD_DEVELOPMENT";
-#endif
-	
-	UE_LOG(LogTemp, Warning, TEXT("BuildOption: %s"), *BuildOption);
-	BuildOption = FString("BuildOption: ").Append(BuildOption);
-	GEngine->AddOnScreenDebugMessage(0, 10.f, FColor::Emerald, BuildOption);
 }
 
 void ULeaderboardWidget::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
@@ -43,23 +27,6 @@ void ULeaderboardWidget::OnResponseReceived(FHttpRequestPtr Request, FHttpRespon
 	{
 		ProcessScanResponse(Request, Response);
 	}
-	UE_LOG(LogHttp, Warning, TEXT("Response Received..."));
-	int32 ResponseCode = Response->GetResponseCode();
-	TArray<FString> Headers = Response->GetAllHeaders();
-	FString Content = Response->GetContentAsString();
-
-	UE_LOG(LogHttp, Warning, TEXT("%i"), Headers.Num());
-
-	FString HeaderString;
-	for(FString& msg : Headers)
-	{
-		HeaderString.Append(msg);
-	}
-    
-	UE_LOG(LogHttp, Warning, TEXT("StatusCode: %i | Headers: %s | Content: %s"), ResponseCode, *HeaderString, *Content);
-
-	FString OnScreenMessage = FString::Printf(TEXT("StatusCode: %i \n| Headers: %s \n| Content: %s"), ResponseCode, *HeaderString, *Content);
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Yellow, OnScreenMessage);
 }
 
 void ULeaderboardWidget::ProcessScanResponse(FHttpRequestPtr Request, FHttpResponsePtr Response)
@@ -75,7 +42,6 @@ void ULeaderboardWidget::ProcessScanResponse(FHttpRequestPtr Request, FHttpRespo
 		{
 			FString Username = JsonValuePtr.Get()->AsObject()->GetStringField("Username");
 			float Score = JsonValuePtr.Get()->AsObject()->GetNumberField("Score");
-			UE_LOG(LogHttp, Warning, TEXT("Username: %s     Score: %f"), *Username, Score);
 			UsersScores.Add(FUserScore(Username,Score));
 		}
 		SortUsersScores();

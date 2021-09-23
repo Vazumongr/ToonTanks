@@ -31,32 +31,12 @@ void USignInWidget::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr
 	}
 	if(Response->GetContentAsString().Len() <= 2)
 	{
-		//DisplayInvalidLogin();
-		UE_LOG(LogHttp, Warning, TEXT("User doesn't exist. Creating user."));
 		CreateUser();
 	}
 	else
 	{
 		ValidateUserPassComb(Response);
 	}
-
-	
-	int32 ResponseCode = Response->GetResponseCode();
-	TArray<FString> Headers = Response->GetAllHeaders();
-	FString Content = Response->GetContentAsString();
-
-	UE_LOG(LogHttp, Warning, TEXT("%i"), Headers.Num());
-
-	FString HeaderString;
-	for(FString& msg : Headers)
-	{
-		HeaderString.Append(msg);
-	}
-    
-	UE_LOG(LogHttp, Warning, TEXT("StatusCode: %i | Headers: %s | Content: %s"), ResponseCode, *HeaderString, *Content);
-
-	FString OnScreenMessage = FString::Printf(TEXT("StatusCode: %i \n| Headers: %s \n| Content: %s"), ResponseCode, *HeaderString, *Content);
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Yellow, OnScreenMessage);
 }
 
 void USignInWidget::SignInUser()
