@@ -22,35 +22,20 @@ void UHealthComponent::BeginPlay()
 	Health = DefaultHealth;
 
 	GameModeRef = Cast<ATankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-
 	Owner = GetOwner();
-	if(Owner)
-	{
-		Owner->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::TakeDamage);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Health component has no reference to the Owner"));
-	}
-	
 }
 
-void UHealthComponent::TakeDamage(AActor* DamagedACtor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
-{	
-	if(Damage == 0 || Health <= 0)
-	{
-		return;
-	}
-
+void UHealthComponent::TakeDamage(float Damage, AActor* DamagedBy, AController* InstigatedBy)
+{
+	if(Damage == 0 || Health <= 0) return;
+	
 	Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);
-	
-	UE_LOG(LogTemp, Warning, TEXT("REMAINING HEALTH: %f"), Health);
-	
 	if(Health <= 0)
 	{
 		if(GameModeRef)
 		{
 			GameModeRef->ActorDied(Owner);
+			UE_LOG(LogTemp, Warning, TEXT("Notified gamemode of death"));
 		}
 		else
 		{

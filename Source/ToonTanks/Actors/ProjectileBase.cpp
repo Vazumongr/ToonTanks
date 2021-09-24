@@ -5,6 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "ToonTanks/Pawns/PawnBase.h"
 
 // Sets default values
 AProjectileBase::AProjectileBase()
@@ -29,13 +30,16 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 {
 	// Try to get a reference to the owning class
 	AActor* MyOwner = GetOwner();
-
 	if(!MyOwner) { return; }
 
 	// If the OtherActors isn't self or owner && exists, then apply damage.
-	if(OtherActor != NULL && OtherActor != this && OtherActor != MyOwner)
+	if(OtherActor != nullptr && OtherActor != this && OtherActor != MyOwner)
 	{
-		UGameplayStatics::ApplyDamage(OtherActor, Damage, MyOwner->GetInstigatorController(), this, DamageType);
+		APawnBase* PawnHit = Cast<APawnBase>(OtherActor);
+		if(PawnHit != nullptr)
+		{
+			PawnHit->TakeDamage(Damage, this, MyOwner->GetInstigatorController());
+		}
 	}
 
 	// Do a bunch of effects here during polish phase.

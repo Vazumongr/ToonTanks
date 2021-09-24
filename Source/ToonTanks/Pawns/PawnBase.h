@@ -21,6 +21,8 @@ public:
 	APawnBase();
 	
 	void PawnDestroyed();
+
+	void TakeDamage(float Damage, AActor* DamagedBy, class AController* InstigatedBy);
 	
 private:
 
@@ -46,5 +48,11 @@ protected:
 
 	// Handle the destruction. Virtual because it will be overriden
 	virtual void HandleDestruction();
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<AActor> DropClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+	class UHealthComponent* HealthComponent;
 
 };

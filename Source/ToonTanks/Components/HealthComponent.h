@@ -22,9 +22,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetHealth() const { return Health; }
 
+	UFUNCTION()
+	void TakeDamage(float Damage, AActor* DamagedBy, class AController* InstigatedBy);
+
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health", meta = (AllowPrivateAccess = "true"))
 	float DefaultHealth = 100.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health", meta = (AllowPrivateAccess = "true"))
 	float Health = 0.0f;
 
 	UPROPERTY()
@@ -36,6 +40,6 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	UFUNCTION()
-	void TakeDamage(AActor* DamagedACtor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+	//UFUNCTION()
+	//void TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 };

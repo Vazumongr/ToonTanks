@@ -5,8 +5,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "ToonTanks/Actors/ProjectileBase.h"
+#include "ToonTanks/Components/HealthComponent.h"
 #include "ToonTanks/GameModes/TankGameModeBase.h"
-#include "Windows/LiveCoding/Private/External/LC_Process.h"
 
 // Sets default values
 APawnBase::APawnBase()
@@ -30,11 +30,21 @@ APawnBase::APawnBase()
 	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Projectile Spawn Point"));
 	ProjectileSpawnPoint->SetupAttachment((TurretMesh));
 
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
+
 }
 
 void APawnBase::PawnDestroyed()
 {
 	HandleDestruction();
+}
+
+void APawnBase::TakeDamage(float Damage, AActor* DamagedBy, AController* InstigatedBy)
+{
+	if(HealthComponent != nullptr)
+	{
+		HealthComponent->TakeDamage(Damage, DamagedBy, InstigatedBy);
+	}
 }
 
 void APawnBase::RotateTurret(FVector LookAtTarget)
@@ -66,25 +76,7 @@ void APawnBase::Fire()
 
 void APawnBase::HandleDestruction()
 {
-	/*
-	UWorld* World = GetWorld();
-	ATankGameModeBase* GameMode = nullptr;
-	if(World!=nullptr)
-	{
-		GameMode = Cast<ATankGameModeBase>(World->GetAuthGameMode());
-	}
-	if(GameMode!=nullptr)
-	{
-		GameMode->AddScore(this,this);
-	}
-	*/
-	// Universal functionality ---
-	// Play death effects particles, sound, camera shake, etc.
-	//
-	// ... Then do unique child overrides
-	// -- PawnTurret - Inform GameMode Turret died -> Then Destroy() self
-	//
-	// -- PawnTank - Inform GameMode Player died -> Then Hide() all components && stop movement Input
+	GetWorld()->SpawnActor<AActor>(DropClass, GetActorLocation(), FRotator(0,0,0));
 }
 
 
