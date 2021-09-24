@@ -22,7 +22,9 @@ public:
 	
 	void PawnDestroyed();
 
-	void TakeDamage(float Damage, AActor* DamagedBy, class AController* InstigatedBy);
+	virtual void BeginPlay() override;
+
+	void MyTakeDamage(float Damage, AActor* DamagedBy, class AController* InstigatedBy);
 	
 private:
 

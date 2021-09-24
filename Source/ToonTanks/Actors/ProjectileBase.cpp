@@ -38,7 +38,7 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 		APawnBase* PawnHit = Cast<APawnBase>(OtherActor);
 		if(PawnHit != nullptr)
 		{
-			PawnHit->TakeDamage(Damage, this, MyOwner->GetInstigatorController());
+			PawnHit->MyTakeDamage(Damage, this, MyOwner->GetInstigatorController());
 		}
 	}
 

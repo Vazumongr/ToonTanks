@@ -39,7 +39,12 @@ void APawnBase::PawnDestroyed()
 	HandleDestruction();
 }
 
-void APawnBase::TakeDamage(float Damage, AActor* DamagedBy, AController* InstigatedBy)
+void APawnBase::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void APawnBase::MyTakeDamage(float Damage, AActor* DamagedBy, AController* InstigatedBy)
 {
 	if(HealthComponent != nullptr)
 	{

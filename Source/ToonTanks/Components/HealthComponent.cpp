@@ -20,7 +20,6 @@ void UHealthComponent::BeginPlay()
 	Super::BeginPlay();
 
 	Health = DefaultHealth;
-
 	GameModeRef = Cast<ATankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	Owner = GetOwner();
 }
@@ -30,6 +29,8 @@ void UHealthComponent::TakeDamage(float Damage, AActor* DamagedBy, AController* 
 	if(Damage == 0 || Health <= 0) return;
 	
 	Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);
+	HealthChanged.Execute(Health);
+	HealthChangedDynamic.ExecuteIfBound(Health);
 	if(Health <= 0)
 	{
 		if(GameModeRef)

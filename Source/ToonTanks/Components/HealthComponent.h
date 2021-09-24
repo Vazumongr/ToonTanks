@@ -10,6 +10,9 @@
 
 class ATankGameModeBase;
 
+DECLARE_DELEGATE_OneParam(FHealthChangedDelegate, float);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FHealthChangedDynamicDelegate, float, NewHealth);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TOONTANKS_API UHealthComponent : public UActorComponent
 {
@@ -18,6 +21,10 @@ class TOONTANKS_API UHealthComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UHealthComponent();
+
+	FHealthChangedDelegate HealthChanged;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FHealthChangedDynamicDelegate HealthChangedDynamic;
 
 	UFUNCTION(BlueprintCallable)
 	float GetHealth() const { return Health; }
