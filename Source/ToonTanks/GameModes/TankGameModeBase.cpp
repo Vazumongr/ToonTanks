@@ -70,7 +70,6 @@ void ATankGameModeBase::OnResponseReceived(FHttpRequestPtr Request, FHttpRespons
     if(Request == InsertRequest)
     {
         UE_LOG(LogHttp, Warning, TEXT("Our insert finished!"));
-        ShowEndGameMenu(bPlayerWon);
     }
 }
 
@@ -129,9 +128,8 @@ void ATankGameModeBase::HandleGameStart()
 void ATankGameModeBase::HandleGameOver(bool PlayerWon)
 {
     GameOver(PlayerWon);
-    bPlayerWon = PlayerWon;
+    ShowEndGameMenu(PlayerWon);
     float PlayersScore = PlayerController->GetScore();
-    UE_LOG(LogTemp, Warning, TEXT("Score: %f"), PlayersScore);
     AddScoreToLeaderboard(PlayersScore);
 }
 

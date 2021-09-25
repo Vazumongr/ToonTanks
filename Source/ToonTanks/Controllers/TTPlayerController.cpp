@@ -1,7 +1,10 @@
 ﻿#include "TTPlayerController.h"
 
 #include "Blueprint/UserWidget.h"
+#include "ToonTanks/Components/HealthComponent.h"
+#include "ToonTanks/Pawns/PawnBase.h"
 #include "ToonTanks/PlayerStates/TTPlayerState.h"
+#include "ToonTanks/UserInterface/TTHUD.h"
 
 ATTPlayerController::ATTPlayerController()
 {
@@ -15,6 +18,27 @@ void ATTPlayerController::Tick(float DeltaSeconds)
 	FString Name = PlayerState->GetPlayerName();
 	FString Message = (FString::Printf(TEXT("%s score: %f"), *TTPS->UserName, Score));
 	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Emerald,Message);
+}
+
+void ATTPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+	UTTHUD* HUD = Cast<UTTHUD>(CreateWidget(this, HUDClass, TEXT("HUD")));
+	if(HUD!=nullptr)
+	{
+		HUD->SetOwner(this);
+		HUD->AddToViewport();
+		APawnBase* PlayerChar = GetPawn<APawnBase>();
+		if(PlayerChar != nullptr)
+		{
+			UHealthComponent* HealthComponent = PlayerChar->GetHealthComponent();
+			if(HealthComponent != nullptr)
+			{
+				HealthComponent->HealthChanged.BindUObject(HUD, &UTTHUD::UpdateHealth);
+				HealthComponent->HealthChangedDynamic.BindUFunction(HUD, "UpdateHealth");
+			}
+		}
+	}
 }
 
 void ATTPlayerController::AddScore(float InScore)

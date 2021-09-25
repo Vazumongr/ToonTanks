@@ -25,6 +25,7 @@ public:
 	virtual void BeginPlay() override;
 
 	void MyTakeDamage(float Damage, AActor* DamagedBy, class AController* InstigatedBy);
+	FORCEINLINE class UHealthComponent* GetHealthComponent() const { return HealthComponent;}
 	
 private:
 

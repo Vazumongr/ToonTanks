@@ -12,6 +12,7 @@ public:
 	ATTPlayerController();
 
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void BeginPlay() override;
 
 	void AddScore(float InScore);
 	UFUNCTION(BlueprintCallable)
@@ -20,11 +21,17 @@ public:
 protected:
 	virtual void SetupInputComponent() override;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="User Interface")
 	class UUserWidget* PauseMenuWidget;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="User Interface")
 	class TSubclassOf<UUserWidget> PauseMenuClass;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="User Interface")
+	class UTTHUD* HUDWidget;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="User Interface")
+	class TSubclassOf<UTTHUD> HUDClass;
 
 
 private:
