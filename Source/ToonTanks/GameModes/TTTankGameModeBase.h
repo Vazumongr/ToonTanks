@@ -7,18 +7,18 @@
 #include "GameFramework/GameModeBase.h"
 #include "Runtime/Online/HTTP/Public/Http.h"
 
-#include "TankGameModeBase.generated.h"
+#include "TTTankGameModeBase.generated.h"
 
-class APawnTurret;
-class APawnTank;
+class ATTPawnTurret;
+class ATTPawnTank;
 
 UCLASS()
-class TOONTANKS_API ATankGameModeBase : public AGameModeBase
+class TOONTANKS_API ATTTankGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 
 public:
-	ATankGameModeBase();
+	ATTTankGameModeBase();
 
 	FHttpModule* Http;
 	
@@ -48,7 +48,7 @@ private:
 	int32 TargetTurrets = 0;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player", meta = (AllowPrivateAccess = "true"))
-	APawnTank* PlayerTank;
+	ATTPawnTank* PlayerTank;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	class ATTPlayerController* PlayerController;
 

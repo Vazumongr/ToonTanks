@@ -1,8 +1,8 @@
 ﻿#include "TTPlayerController.h"
 
 #include "Blueprint/UserWidget.h"
-#include "ToonTanks/Components/HealthComponent.h"
-#include "ToonTanks/Pawns/PawnBase.h"
+#include "ToonTanks/Components/TTHealthComponent.h"
+#include "ToonTanks/Pawns/TTPawnBase.h"
 #include "ToonTanks/PlayerStates/TTPlayerState.h"
 #include "ToonTanks/UserInterface/TTHUD.h"
 
@@ -28,10 +28,10 @@ void ATTPlayerController::BeginPlay()
 	{
 		HUD->SetOwner(this);
 		HUD->AddToViewport();
-		APawnBase* PlayerChar = GetPawn<APawnBase>();
+		ATTPawnBase* PlayerChar = GetPawn<ATTPawnBase>();
 		if(PlayerChar != nullptr)
 		{
-			UHealthComponent* HealthComponent = PlayerChar->GetHealthComponent();
+			UTTHealthComponent* HealthComponent = PlayerChar->GetHealthComponent();
 			if(HealthComponent != nullptr)
 			{
 				HealthComponent->HealthChanged.BindUObject(HUD, &UTTHUD::UpdateHealth);

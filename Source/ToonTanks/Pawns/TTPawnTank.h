@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PawnBase.h"
-#include "PawnTank.generated.h"
+#include "TTPawnBase.h"
+#include "TTPawnTank.generated.h"
 
 /**
  * 
@@ -14,14 +14,14 @@ class USpringArmComponent;
 class UCameraComponent;
 
 UCLASS()
-class TOONTANKS_API APawnTank : public APawnBase
+class TOONTANKS_API ATTPawnTank : public ATTPawnBase
 {
 	GENERATED_BODY()
 
 
 public:
 
-    APawnTank();
+    ATTPawnTank();
 
     // Called every frame
     virtual void Tick(float DeltaTime) override;

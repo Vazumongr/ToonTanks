@@ -5,10 +5,10 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 
-#include "MainMenuGameMode.generated.h"
+#include "TTMainMenuGameMode.generated.h"
 
 UCLASS()
-class TOONTANKS_API AMainMenuGameMode : public AGameModeBase
+class TOONTANKS_API ATTMainMenuGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 

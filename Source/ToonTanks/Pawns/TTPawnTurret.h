@@ -3,22 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PawnBase.h"
-#include "PawnTurret.generated.h"
+#include "TTPawnBase.h"
+#include "TTPawnTurret.generated.h"
 
-class APawnTank;
+class ATTPawnTank;
 
 /**
  * 
  */
 UCLASS()
-class TOONTANKS_API APawnTurret : public APawnBase
+class TOONTANKS_API ATTPawnTurret : public ATTPawnBase
 {
 	GENERATED_BODY()
 	
 public:
 
-	APawnTurret();
+	ATTPawnTurret();
 
     // Called every frame
     virtual void Tick(float DeltaTime) override;
@@ -33,7 +33,7 @@ private:
 	FTimerHandle FireRateTimerHandle;
 
 	UPROPERTY()
-	APawnTank* PlayerPawn;
+	ATTPawnTank* PlayerPawn;
 
 	void CheckFireCondition();
 

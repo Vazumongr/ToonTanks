@@ -1,28 +1,28 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ToonTanks/UserInterface/SignInWidget.h"
+#include "ToonTanks/UserInterface/TTSignInWidget.h"
 
 #include "Components/EditableTextBox.h"
 
 
-USignInWidget::USignInWidget(const FObjectInitializer& ObjectInitializer) :Super(ObjectInitializer)
+UTTSignInWidget::UTTSignInWidget(const FObjectInitializer& ObjectInitializer) :Super(ObjectInitializer)
 {
 	Http = &FHttpModule::Get();
 }
 
-bool USignInWidget::Initialize()
+bool UTTSignInWidget::Initialize()
 {
 	if(!Super::Initialize()) return false;
 	return true;
 }
 
-void USignInWidget::Setup()
+void UTTSignInWidget::Setup()
 {
 	
 }
 
-void USignInWidget::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+void UTTSignInWidget::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
 {
 	if(CreateUserRequest == Request)
 	{
@@ -39,7 +39,7 @@ void USignInWidget::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr
 	}
 }
 
-void USignInWidget::SignInUser()
+void UTTSignInWidget::SignInUser()
 {
 	UE_LOG(LogHttp, Warning, TEXT("Signing in..."));
 	Username = UsernameTextBox->GetText().ToString();
@@ -58,7 +58,7 @@ void USignInWidget::SignInUser()
 
 	FString URL = FString::Printf(TEXT("https://9bkd1wd39i.execute-api.us-east-2.amazonaws.com/users/%s"), *Username);
 	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Http->CreateRequest();
-	Request->OnProcessRequestComplete().BindUObject(this, &USignInWidget::OnResponseReceived);
+	Request->OnProcessRequestComplete().BindUObject(this, &UTTSignInWidget::OnResponseReceived);
 	//This is the url on which to process the request
 	Request->SetURL(URL);
 	Request->SetVerb("GET");
@@ -67,7 +67,7 @@ void USignInWidget::SignInUser()
 	Request->ProcessRequest();
 }
 
-void USignInWidget::CreateUser()
+void UTTSignInWidget::CreateUser()
 {
 	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
 	JsonObject->SetStringField("Username", Username);
@@ -77,7 +77,7 @@ void USignInWidget::CreateUser()
 	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 
 	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Http->CreateRequest();
-	Request->OnProcessRequestComplete().BindUObject(this, &USignInWidget::OnResponseReceived);
+	Request->OnProcessRequestComplete().BindUObject(this, &UTTSignInWidget::OnResponseReceived);
 	//This is the url on which to process the request
 	Request->SetURL("https://9bkd1wd39i.execute-api.us-east-2.amazonaws.com/users");
 	Request->SetVerb("PUT");
@@ -88,7 +88,7 @@ void USignInWidget::CreateUser()
 	CreateUserRequest = Request;
 }
 
-void USignInWidget::ValidateUserPassComb(FHttpResponsePtr Response)
+void UTTSignInWidget::ValidateUserPassComb(FHttpResponsePtr Response)
 {
 	TSharedPtr<FJsonObject> JsonObject;
 	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());

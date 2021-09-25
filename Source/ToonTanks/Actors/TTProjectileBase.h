@@ -5,18 +5,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "ProjectileBase.generated.h"
+#include "TTProjectileBase.generated.h"
 
 class UProjectileMovementComponent;
 
 UCLASS()
-class TOONTANKS_API AProjectileBase : public AActor
+class TOONTANKS_API ATTProjectileBase : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AProjectileBase();
+	ATTProjectileBase();
 
 private:
 

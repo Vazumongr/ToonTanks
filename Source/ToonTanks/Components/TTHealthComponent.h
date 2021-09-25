@@ -4,23 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "ToonTanks/GameModes/TankGameModeBase.h"
+#include "ToonTanks/GameModes/TTTankGameModeBase.h"
 
-#include "HealthComponent.generated.h"
+#include "TTHealthComponent.generated.h"
 
-class ATankGameModeBase;
+class ATTTankGameModeBase;
 
 DECLARE_DELEGATE_OneParam(FHealthChangedDelegate, float);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FHealthChangedDynamicDelegate, float, NewHealth);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class TOONTANKS_API UHealthComponent : public UActorComponent
+class TOONTANKS_API UTTHealthComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UHealthComponent();
+	UTTHealthComponent();
 
 	FHealthChangedDelegate HealthChanged;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -41,12 +41,9 @@ private:
 	UPROPERTY()
 	AActor* Owner;
 	UPROPERTY()
-	ATankGameModeBase* GameModeRef;
+	ATTTankGameModeBase* GameModeRef;
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
-	//UFUNCTION()
-	//void TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 };

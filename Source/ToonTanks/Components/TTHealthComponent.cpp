@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "HealthComponent.h"
-#include "ToonTanks/GameModes/TankGameModeBase.h"
+#include "TTHealthComponent.h"
+#include "ToonTanks/GameModes/TTTankGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
-UHealthComponent::UHealthComponent()
+UTTHealthComponent::UTTHealthComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -15,18 +15,18 @@ UHealthComponent::UHealthComponent()
 
 
 // Called when the game starts
-void UHealthComponent::BeginPlay()
+void UTTHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
 	Health = DefaultHealth;
-	GameModeRef = Cast<ATankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	GameModeRef = Cast<ATTTankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	Owner = GetOwner();
 	HealthChanged.ExecuteIfBound(Health);
 	//HealthChangedDynamic.ExecuteIfBound(Health);
 }
 
-void UHealthComponent::TakeDamage(float Damage, AActor* DamagedBy, AController* InstigatedBy)
+void UTTHealthComponent::TakeDamage(float Damage, AActor* DamagedBy, AController* InstigatedBy)
 {
 	if(Damage == 0 || Health <= 0) return;
 	

@@ -5,27 +5,27 @@
 #include "CoreMinimal.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Pawn.h"
-#include "PawnBase.generated.h"
+#include "TTPawnBase.generated.h"
 
 class UCapsuleComponent;
-class AProjectileBase;
+class ATTProjectileBase;
 
 UCLASS()
-class TOONTANKS_API APawnBase : public APawn
+class TOONTANKS_API ATTPawnBase : public APawn
 {
 	GENERATED_BODY()
 
 
 public:
 	// Sets default values for this pawn's properties
-	APawnBase();
+	ATTPawnBase();
 	
 	void PawnDestroyed();
 
 	virtual void BeginPlay() override;
 
 	void MyTakeDamage(float Damage, AActor* DamagedBy, class AController* InstigatedBy);
-	FORCEINLINE class UHealthComponent* GetHealthComponent() const { return HealthComponent;}
+	FORCEINLINE class UTTHealthComponent* GetHealthComponent() const { return HealthComponent;}
 	
 private:
 
@@ -39,7 +39,7 @@ private:
 	USceneComponent* ProjectileSpawnPoint;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile Type", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<AProjectileBase> ProjectileClass;
+	TSubclassOf<ATTProjectileBase> ProjectileClass;
 
 protected:
 
@@ -56,6 +56,6 @@ protected:
 	TSubclassOf<AActor> DropClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
-	class UHealthComponent* HealthComponent;
+	class UTTHealthComponent* HealthComponent;
 
 };

@@ -1,21 +1,21 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-#include "TankGameModeBase.h"
+#include "TTTankGameModeBase.h"
 
-#include "ToonTanks/Pawns/PawnTank.h"
-#include "ToonTanks/Pawns/PawnTurret.h"
+#include "ToonTanks/Pawns/TTPawnTank.h"
+#include "ToonTanks/Pawns/TTPawnTurret.h"
 #include "ToonTanks/Controllers/TTPlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "ToonTanks/GameInstances/TTGameInstance.h"
 
-ATankGameModeBase::ATankGameModeBase()
+ATTTankGameModeBase::ATTTankGameModeBase()
 {
     Http = &FHttpModule::Get();
 }
 
-void ATankGameModeBase::ScanLeaderboard()
+void ATTTankGameModeBase::ScanLeaderboard()
 {
     TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Http->CreateRequest();
-    Request->OnProcessRequestComplete().BindUObject(this, &ATankGameModeBase::OnResponseReceived);
+    Request->OnProcessRequestComplete().BindUObject(this, &ATTTankGameModeBase::OnResponseReceived);
     //This is the url on which to process the request
     Request->SetURL(APILINK);
     Request->SetVerb("GET");
@@ -24,7 +24,7 @@ void ATankGameModeBase::ScanLeaderboard()
     Request->ProcessRequest();
 }
 
-void ATankGameModeBase::AddScoreToLeaderboard(float PlayersScore)
+void ATTTankGameModeBase::AddScoreToLeaderboard(float PlayersScore)
 {
     TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
 
@@ -40,7 +40,7 @@ void ATankGameModeBase::AddScoreToLeaderboard(float PlayersScore)
     FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 
     TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Http->CreateRequest();
-    Request->OnProcessRequestComplete().BindUObject(this, &ATankGameModeBase::OnResponseReceived);
+    Request->OnProcessRequestComplete().BindUObject(this, &ATTTankGameModeBase::OnResponseReceived);
     //This is the url on which to process the request
     Request->SetURL(APILINK);
     Request->SetVerb("PUT");
@@ -51,7 +51,7 @@ void ATankGameModeBase::AddScoreToLeaderboard(float PlayersScore)
     InsertRequest = Request;
 }
 
-void ATankGameModeBase::SetUsername()
+void ATTTankGameModeBase::SetUsername()
 {
     UTTGameInstance* GameInstance = Cast<UTTGameInstance>(GetGameInstance());
     
@@ -65,7 +65,7 @@ void ATankGameModeBase::SetUsername()
 }
 
 
-void ATankGameModeBase::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+void ATTTankGameModeBase::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
 {
     if(Request == InsertRequest)
     {
@@ -73,10 +73,10 @@ void ATankGameModeBase::OnResponseReceived(FHttpRequestPtr Request, FHttpRespons
     }
 }
 
-void ATankGameModeBase::BeginPlay()
+void ATTTankGameModeBase::BeginPlay()
 {
     TargetTurrets = GetTargetTurretCount();
-    PlayerTank = Cast<APawnTank>(UGameplayStatics::GetPlayerPawn(this, 0));
+    PlayerTank = Cast<ATTPawnTank>(UGameplayStatics::GetPlayerPawn(this, 0));
     PlayerController = PlayerTank->GetController<ATTPlayerController>();
 
     HandleGameStart();
@@ -86,14 +86,14 @@ void ATankGameModeBase::BeginPlay()
     Super::BeginPlay();
 }
 
-void ATankGameModeBase::ActorDied(AActor* DeadActor)
+void ATTTankGameModeBase::ActorDied(AActor* DeadActor)
 {
     if(DeadActor == PlayerTank)
     {
         PlayerTank->PawnDestroyed();
         HandleGameOver(false);
     }
-    else if(APawnTurret* DestroyedTurret = Cast<APawnTurret>(DeadActor))
+    else if(ATTPawnTurret* DestroyedTurret = Cast<ATTPawnTurret>(DeadActor))
     {
         DestroyedTurret->PawnDestroyed();
         AddScore(DeadActor);
@@ -104,7 +104,7 @@ void ATankGameModeBase::ActorDied(AActor* DeadActor)
     }
 }
 
-void ATankGameModeBase::AddScore(AActor* KilledActor)
+void ATTTankGameModeBase::AddScore(AActor* KilledActor)
 {
     if(KilledActor == nullptr)
     {
@@ -120,12 +120,12 @@ void ATankGameModeBase::AddScore(AActor* KilledActor)
         PlayerController->AddScore(*TargetScore);
 }
 
-void ATankGameModeBase::HandleGameStart()
+void ATTTankGameModeBase::HandleGameStart()
 {
     GameStart();
 }
 
-void ATankGameModeBase::HandleGameOver(bool PlayerWon)
+void ATTTankGameModeBase::HandleGameOver(bool PlayerWon)
 {
     GameOver(PlayerWon);
     ShowEndGameMenu(PlayerWon);
@@ -133,10 +133,10 @@ void ATankGameModeBase::HandleGameOver(bool PlayerWon)
     AddScoreToLeaderboard(PlayersScore);
 }
 
-int32 ATankGameModeBase::GetTargetTurretCount()
+int32 ATTTankGameModeBase::GetTargetTurretCount()
 {
-    TSubclassOf<APawnTurret> ClassToFind;
-    ClassToFind = APawnTurret::StaticClass();
+    TSubclassOf<ATTPawnTurret> ClassToFind;
+    ClassToFind = ATTPawnTurret::StaticClass();
     TArray<AActor*> TurretActors;
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), ClassToFind, TurretActors);
     return TurretActors.Num();

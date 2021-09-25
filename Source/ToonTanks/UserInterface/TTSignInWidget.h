@@ -7,17 +7,17 @@
 #include "Blueprint/UserWidget.h"
 #include "Runtime/Online/HTTP/Public/Http.h"
 
-#include "SignInWidget.generated.h"
+#include "TTSignInWidget.generated.h"
 
 /**
 * 
 */
 UCLASS()
-class TOONTANKS_API USignInWidget : public UUserWidget
+class TOONTANKS_API UTTSignInWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
-	USignInWidget(const FObjectInitializer& ObjectInitializer);
+	UTTSignInWidget(const FObjectInitializer& ObjectInitializer);
 
 	virtual bool Initialize() override;
 

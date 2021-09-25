@@ -1,27 +1,27 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PawnTurret.h"
+#include "TTPawnTurret.h"
 
 #include "Kismet/GameplayStatics.h"
-#include "PawnTank.h"
+#include "TTPawnTank.h"
 
-APawnTurret::APawnTurret()
+ATTPawnTurret::ATTPawnTurret()
 {
 	
 }
 
 // Called when the game starts or when spawned
-void APawnTurret::BeginPlay()
+void ATTPawnTurret::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetWorld()->GetTimerManager().SetTimer(FireRateTimerHandle, this, &APawnTurret::CheckFireCondition, FireRate, true, false);
+	GetWorld()->GetTimerManager().SetTimer(FireRateTimerHandle, this, &ATTPawnTurret::CheckFireCondition, FireRate, true, false);
 
-	PlayerPawn = Cast<APawnTank>(UGameplayStatics::GetPlayerPawn(this, 0));
+	PlayerPawn = Cast<ATTPawnTank>(UGameplayStatics::GetPlayerPawn(this, 0));
 }
 
-void APawnTurret::CheckFireCondition()
+void ATTPawnTurret::CheckFireCondition()
 {
 	// Checks for nullptr
 	if(!PlayerPawn) { return; }
@@ -34,7 +34,7 @@ void APawnTurret::CheckFireCondition()
 	}
 }
 
-float APawnTurret::ReturnDistanceToPlayer() const
+float ATTPawnTurret::ReturnDistanceToPlayer() const
 {
 	if(!PlayerPawn) { return 0.0f; }
 
@@ -42,7 +42,7 @@ float APawnTurret::ReturnDistanceToPlayer() const
 	return Distance;
 }
 
-void APawnTurret::HandleDestruction()
+void ATTPawnTurret::HandleDestruction()
 {
 	Super::HandleDestruction();
 	UE_LOG(LogTemp, Warning, TEXT("Called Destroy"));
@@ -50,7 +50,7 @@ void APawnTurret::HandleDestruction()
 }
 
 // Called every frame
-void APawnTurret::Tick(float DeltaTime)
+void ATTPawnTurret::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 

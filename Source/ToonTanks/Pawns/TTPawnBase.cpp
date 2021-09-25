@@ -1,15 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PawnBase.h"
+#include "TTPawnBase.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "ToonTanks/Actors/ProjectileBase.h"
-#include "ToonTanks/Components/HealthComponent.h"
-#include "ToonTanks/GameModes/TankGameModeBase.h"
+#include "ToonTanks/Actors/TTProjectileBase.h"
+#include "ToonTanks/Components/TTHealthComponent.h"
+#include "ToonTanks/GameModes/TTTankGameModeBase.h"
 
 // Sets default values
-APawnBase::APawnBase()
+ATTPawnBase::ATTPawnBase()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -30,21 +30,21 @@ APawnBase::APawnBase()
 	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Projectile Spawn Point"));
 	ProjectileSpawnPoint->SetupAttachment((TurretMesh));
 
-	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
+	HealthComponent = CreateDefaultSubobject<UTTHealthComponent>(TEXT("Health Component"));
 
 }
 
-void APawnBase::PawnDestroyed()
+void ATTPawnBase::PawnDestroyed()
 {
 	HandleDestruction();
 }
 
-void APawnBase::BeginPlay()
+void ATTPawnBase::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void APawnBase::MyTakeDamage(float Damage, AActor* DamagedBy, AController* InstigatedBy)
+void ATTPawnBase::MyTakeDamage(float Damage, AActor* DamagedBy, AController* InstigatedBy)
 {
 	if(HealthComponent != nullptr)
 	{
@@ -52,7 +52,7 @@ void APawnBase::MyTakeDamage(float Damage, AActor* DamagedBy, AController* Insti
 	}
 }
 
-void APawnBase::RotateTurret(FVector LookAtTarget)
+void ATTPawnBase::RotateTurret(FVector LookAtTarget)
 {
 	// Update Turretmesh rotation to face towards the LookAtTarget passed in from the child class.
 	// TurretMesh->SetWorldRotation()...
@@ -65,7 +65,7 @@ void APawnBase::RotateTurret(FVector LookAtTarget)
 	TurretMesh->SetWorldRotation(TurretRotation);
 }
 
-void APawnBase::Fire()
+void ATTPawnBase::Fire()
 {
 	// Get ProjectileSpawnPoint Location && Rotation -> Spawn Projectile class at location towards rotation
 	if(ProjectileClass)
@@ -73,13 +73,13 @@ void APawnBase::Fire()
 		FVector SpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
 		FRotator SpawnRotation = ProjectileSpawnPoint->GetComponentRotation();
 		
-		AProjectileBase* TempProjecile = GetWorld()->SpawnActor<AProjectileBase>(ProjectileClass, SpawnLocation, SpawnRotation);
+		ATTProjectileBase* TempProjecile = GetWorld()->SpawnActor<ATTProjectileBase>(ProjectileClass, SpawnLocation, SpawnRotation);
 		TempProjecile->SetOwner(this);
 	}
 	
 }
 
-void APawnBase::HandleDestruction()
+void ATTPawnBase::HandleDestruction()
 {
 	GetWorld()->SpawnActor<AActor>(DropClass, GetActorLocation(), FRotator(0,0,0));
 }

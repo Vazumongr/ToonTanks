@@ -1,27 +1,27 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ToonTanks/UserInterface/LeaderboardWidget.h"
+#include "ToonTanks/UserInterface/TTLeaderboardWidget.h"
 
 
-ULeaderboardWidget::ULeaderboardWidget(const FObjectInitializer& ObjectInitializer) :Super(ObjectInitializer)
+UTTLeaderboardWidget::UTTLeaderboardWidget(const FObjectInitializer& ObjectInitializer) :Super(ObjectInitializer)
 {
 	Http = &FHttpModule::Get();
 }
 
-bool ULeaderboardWidget::Initialize()
+bool UTTLeaderboardWidget::Initialize()
 {
 	if(!Super::Initialize()) return false;
 	return true;
 }
 
-void ULeaderboardWidget::Setup()
+void UTTLeaderboardWidget::Setup()
 {
 	HideFields();
 	ScanLeaderboardRequest();
 }
 
-void ULeaderboardWidget::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+void UTTLeaderboardWidget::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
 {
 	if(Response->GetHeader("Result-Type") == "scan")
 	{
@@ -29,7 +29,7 @@ void ULeaderboardWidget::OnResponseReceived(FHttpRequestPtr Request, FHttpRespon
 	}
 }
 
-void ULeaderboardWidget::ProcessScanResponse(FHttpRequestPtr Request, FHttpResponsePtr Response)
+void UTTLeaderboardWidget::ProcessScanResponse(FHttpRequestPtr Request, FHttpResponsePtr Response)
 {
 	TSharedPtr<FJsonObject> JsonObject;
 	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
@@ -49,10 +49,10 @@ void ULeaderboardWidget::ProcessScanResponse(FHttpRequestPtr Request, FHttpRespo
 	}
 }
 
-void ULeaderboardWidget::ScanLeaderboardRequest()
+void UTTLeaderboardWidget::ScanLeaderboardRequest()
 {
 	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Http->CreateRequest();
-	Request->OnProcessRequestComplete().BindUObject(this, &ULeaderboardWidget::OnResponseReceived);
+	Request->OnProcessRequestComplete().BindUObject(this, &UTTLeaderboardWidget::OnResponseReceived);
 	//This is the url on which to process the request
 	Request->SetURL(APILINK);
 	Request->SetVerb("GET");
@@ -61,7 +61,7 @@ void ULeaderboardWidget::ScanLeaderboardRequest()
 	Request->ProcessRequest();
 }
 
-void ULeaderboardWidget::SortUsersScores()
+void UTTLeaderboardWidget::SortUsersScores()
 {
 	int8 i, j, min_idx;
 	FUserScore temp;

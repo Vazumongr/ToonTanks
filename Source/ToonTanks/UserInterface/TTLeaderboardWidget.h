@@ -7,7 +7,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Runtime/Online/HTTP/Public/Http.h"
 
-#include "LeaderboardWidget.generated.h"
+#include "TTLeaderboardWidget.generated.h"
 
 USTRUCT(BlueprintType)
 struct TOONTANKS_API FUserScore
@@ -33,11 +33,11 @@ struct TOONTANKS_API FUserScore
  * 
  */
 UCLASS()
-class TOONTANKS_API ULeaderboardWidget : public UUserWidget
+class TOONTANKS_API UTTLeaderboardWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
-	ULeaderboardWidget(const FObjectInitializer& ObjectInitializer);
+	UTTLeaderboardWidget(const FObjectInitializer& ObjectInitializer);
 
 	virtual bool Initialize() override;
 
