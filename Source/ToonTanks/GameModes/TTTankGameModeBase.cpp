@@ -6,6 +6,7 @@
 #include "ToonTanks/Controllers/TTPlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "ToonTanks/GameInstances/TTGameInstance.h"
+#include "ToonTanks/Subsystems/TTDatabaseAgent.h"
 
 ATTTankGameModeBase::ATTTankGameModeBase()
 {
@@ -130,7 +131,16 @@ void ATTTankGameModeBase::HandleGameOver(bool PlayerWon)
     GameOver(PlayerWon);
     ShowEndGameMenu(PlayerWon);
     float PlayersScore = PlayerController->GetScore();
-    AddScoreToLeaderboard(PlayersScore);
+    UGameInstance* GameInstance = GetGameInstance();
+    if(GameInstance != nullptr)
+    {
+        UTTDatabaseAgent* DatabaseAgent = GameInstance->GetSubsystem<UTTDatabaseAgent>();
+        if(DatabaseAgent != nullptr)
+        {
+            DatabaseAgent->AddScoreToLeaderboard(PlayersScore);
+        }
+    }
+    //AddScoreToLeaderboard(PlayersScore);
 }
 
 int32 ATTTankGameModeBase::GetTargetTurretCount()
