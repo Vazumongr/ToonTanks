@@ -26,6 +26,9 @@ public:
 
 	void MyTakeDamage(float Damage, AActor* DamagedBy, class AController* InstigatedBy);
 	FORCEINLINE class UTTHealthComponent* GetHealthComponent() const { return HealthComponent;}
+
+	UFUNCTION(BlueprintCallable)
+    void Heal(float Amount) const;
 	
 private:
 

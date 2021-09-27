@@ -39,6 +39,12 @@ void ATTPawnBase::PawnDestroyed()
 	HandleDestruction();
 }
 
+void ATTPawnBase::Heal(float Amount) const
+{
+	check(HealthComponent != nullptr);
+	HealthComponent->Heal(Amount);
+}
+
 void ATTPawnBase::BeginPlay()
 {
 	Super::BeginPlay();

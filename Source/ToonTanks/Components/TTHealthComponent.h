@@ -32,6 +32,8 @@ public:
 	UFUNCTION()
 	void TakeDamage(float Damage, AActor* DamagedBy, class AController* InstigatedBy);
 
+	void Heal(float Amount);
+
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health", meta = (AllowPrivateAccess = "true"))
 	float DefaultHealth = 100.0f;

@@ -47,3 +47,9 @@ void UTTHealthComponent::TakeDamage(float Damage, AActor* DamagedBy, AController
 	}
 }
 
+void UTTHealthComponent::Heal(float Amount)
+{
+	Health = FMath::Clamp(Health + Amount, 0.0f, DefaultHealth);
+	HealthChanged.ExecuteIfBound(Health);
+}
+
