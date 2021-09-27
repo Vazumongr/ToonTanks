@@ -2,10 +2,8 @@
 
 #pragma once
 
-//#include "CoreMinimal.h"
-#include "ToonTanks/ToonTanks.h"
+#include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "Runtime/Online/HTTP/Public/Http.h"
 
 #include "TTTankGameModeBase.generated.h"
 
@@ -18,15 +16,6 @@ class TOONTANKS_API ATTTankGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 
 public:
-	ATTTankGameModeBase();
-
-	FHttpModule* Http;
-	
-	/*Assign this function to call when the GET request processes sucessfully*/
-	void OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
-	
-	void ScanLeaderboard();
-	void AddScoreToLeaderboard(float PlayersScore);
 	void SetUsername();
 	
 	void ActorDied(AActor* DeadActor);
@@ -40,7 +29,6 @@ public:
 	
 private:
 
-	FHttpRequestPtr InsertRequest;
 	bool bDevTest = false;
 
 	bool bPlayerWon = false;

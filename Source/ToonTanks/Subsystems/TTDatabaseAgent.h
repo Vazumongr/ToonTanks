@@ -27,10 +27,16 @@ public:
 	// End USubsystem
 
 	void AddScoreToLeaderboard(float PlayersScore);
+	void ProcessScanResponse(FHttpRequestPtr Request, FHttpResponsePtr Response);
+	void ScanLeaderboardRequest(class UTTLeaderboardWidget* InLeaderboard);
 	
 	/*Assign this function to call when the GET request processes sucessfully*/
 	void OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 private:
 	// All my variables
 	FString InsertScoreURL = "https://9bkd1wd39i.execute-api.us-east-2.amazonaws.com/scores";
+	FString Apilink = "https://9bkd1wd39i.execute-api.us-east-2.amazonaws.com/scores";
+	FHttpRequestPtr ScanRequest;
+	UPROPERTY()
+	UTTLeaderboardWidget* Leaderboard;
 };

@@ -2,10 +2,8 @@
 
 #pragma once
 
-//#include "CoreMinimal.h"
-#include "ToonTanks/ToonTanks.h"
+#include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Runtime/Online/HTTP/Public/Http.h"
 
 #include "TTLeaderboardWidget.generated.h"
 
@@ -37,17 +35,7 @@ class TOONTANKS_API UTTLeaderboardWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
-	UTTLeaderboardWidget(const FObjectInitializer& ObjectInitializer);
-
 	virtual bool Initialize() override;
-
-	class FHttpModule* Http;
-	
-	/*Assign this function to call when the GET request processes sucessfully*/
-	void OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
-	void ProcessScanResponse(FHttpRequestPtr Request, FHttpResponsePtr Response);
-	
-	void ScanLeaderboardRequest();
 
 protected:
 
@@ -66,4 +54,6 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable)
 	void Setup();
+
+	void SetUserScores(TArray<FUserScore> InScores);
 };
