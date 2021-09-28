@@ -28,8 +28,18 @@ private:
 	TSubclassOf<UDamageType> DamageType;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float MovementSpeed = 1300.0f;
+	/**
+	 * This is the base damage of the bullet. This is not used
+	 * for applying damage, by calculated for real damage
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage", meta = (AllowPrivateAccess = "true"))
-	float Damage = 50.0f;
+	float BaseDamage = 50.0f;
+	/**
+	 * This is the damage we apply. It is the base damage with any
+	 * modifiers applied to it
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage", meta = (AllowPrivateAccess = "true"))
+	float RealDamage = BaseDamage;
 
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);

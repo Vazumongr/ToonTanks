@@ -26,7 +26,6 @@ struct TOONTANKS_API FUserScore
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float Score = 0;
 };
-
 /**
  * 
  */
