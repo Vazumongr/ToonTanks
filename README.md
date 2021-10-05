@@ -1,2 +1,2 @@
-# UdemyToonTanks
-Repo for Toon Tanks section of Udemy Unreal C++ Course
+# ToonTanks
+This project is built upon an old GamedevTV course. I have added full remote database functionality to store user accounts and user scores for an in-game leaderboard system. The remote database is handled through AWS. Game<->AWS API Gateway<->AWS Lambda<->AWS DynamoDB. This required the addition of new menus and more UI functionality, along with implementation of a scoring system to the game.

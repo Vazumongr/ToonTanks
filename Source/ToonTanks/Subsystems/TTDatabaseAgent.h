@@ -27,7 +27,7 @@ public:
 	// End USubsystem
 
 	void AddScoreToLeaderboard(float PlayersScore);
-	void ProcessScanRequest(FHttpRequestPtr Request, FHttpResponsePtr Response);
+	void ProcessScanRequest(FHttpRequestPtr Request, FHttpResponsePtr Response) const;
 	void ProcessSignInRequest(FHttpRequestPtr Request, FHttpResponsePtr Response);
 	void ScanLeaderboardRequest(class UTTLeaderboardWidget* InLeaderboard);
 	void SignInUser(FString& InUsername, FString& InPassword, class UTTSignInWidget* InSignInMenu);

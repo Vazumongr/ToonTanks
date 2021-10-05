@@ -46,7 +46,7 @@ void UTTDatabaseAgent::AddScoreToLeaderboard(float PlayersScore)
 	Request->ProcessRequest();
 }
 
-void UTTDatabaseAgent::ProcessScanRequest(FHttpRequestPtr Request, FHttpResponsePtr Response)
+void UTTDatabaseAgent::ProcessScanRequest(FHttpRequestPtr Request, FHttpResponsePtr Response) const
 {
 	TSharedPtr<FJsonObject> JsonObject;
 	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
