@@ -4,6 +4,7 @@
 #include "ToonTanks/GameInstances/TTGameInstance.h"
 #include "ToonTanks/UserInterface/TTLeaderboardWidget.h"
 #include "ToonTanks/UserInterface/TTSignInWidget.h"
+#include "Misc/AES.h"
 
 UTTDatabaseAgent::UTTDatabaseAgent()
 {
@@ -99,7 +100,7 @@ void UTTDatabaseAgent::SignInUser(FString& InUsername, FString& InPassword, UTTS
 		return;
 	SignInMenu = InSignInMenu;
 	Username = InUsername;
-	Password = InPassword;
+	Password = EncryptPassword(InPassword);
 	
 	FString URL = FString::Printf(TEXT("https://9bkd1wd39i.execute-api.us-east-2.amazonaws.com/users/%s"), *InUsername);
 	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Http->CreateRequest();
@@ -172,4 +173,40 @@ void UTTDatabaseAgent::OnResponseReceived(FHttpRequestPtr Request, FHttpResponse
 	{
 		SignInMenu->StartGame();
 	}
+}
+
+FString UTTDatabaseAgent::EncryptPassword(FString InPassword)
+{
+	if(InPassword.IsEmpty()) return InPassword;  //empty string? do nothing
+ 
+	uint8* Blob; //we declere uint8 pointer
+	uint32 Size; //for size calculation
+
+	for(int i = 0; i <= InPassword.Len() % 3; i++)
+	{
+		InPassword.Append("salty");
+	}
+ 
+	//first we need to calculate the size of array, encrypted data will be processed in blocks so
+	//data size need to be aligned with block size
+	Size = InPassword.Len();
+	Size = Size + (FAES::AESBlockSize - (Size % FAES::AESBlockSize));
+ 
+	Blob = new uint8[Size]; //So once we calculated size we allocating space in memory 
+	//which we use for encryption
+	//We filling allocated space with string to process
+	if( FString::ToBlob(InPassword,Blob,InPassword.Len())) {
+		FAES::FAESKey Key;
+		Key.Reset();
+		FAES::EncryptData(Blob,Size,Key); //We encrypt the data, don't know how you want to input key
+		InPassword = FString::FromHexBlob(Blob,Size); //now generate hex string of encrypted data
+		delete Blob; //deleting allocation for safety
+		return InPassword; //and return it
+	}
+	else
+	{
+		UE_LOG(LogHttp, Error, TEXT("Password Encryption Failed!"));
+	}
+	delete Blob; //deleting allocation for safety
+	return ""; //If failed return empty string
 }
