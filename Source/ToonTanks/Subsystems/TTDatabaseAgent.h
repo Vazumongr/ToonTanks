@@ -33,6 +33,7 @@ public:
 	void SignInUser(FString& InUsername, FString& InPassword, class UTTSignInWidget* InSignInMenu);
 	void CreateUser();
 	void ValidateUserPassComb(FHttpResponsePtr Response);
+	void ValidateLogin(FString& ResponseString);
 	/*Assign this function to call when the GET request processes sucessfully*/
 	void OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 private:

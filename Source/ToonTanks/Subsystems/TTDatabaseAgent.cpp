@@ -5,6 +5,7 @@
 #include "ToonTanks/UserInterface/TTLeaderboardWidget.h"
 #include "ToonTanks/UserInterface/TTSignInWidget.h"
 #include "Misc/AES.h"
+#include "ToonTanks/ToonTanks.h"
 
 UTTDatabaseAgent::UTTDatabaseAgent()
 {
@@ -68,14 +69,15 @@ void UTTDatabaseAgent::ProcessScanRequest(FHttpRequestPtr Request, FHttpResponse
 
 void UTTDatabaseAgent::ProcessSignInRequest(FHttpRequestPtr Request, FHttpResponsePtr Response)
 {
-	if(Response->GetContentAsString().Len() <= 2)
-	{
+	FString ResponseString = Response->GetContentAsString();
+	if(ResponseString.Equals("Valid"))
+		SignInMenu->StartGame();
+	else if(ResponseString.Equals("Invalid"))
+		SignInMenu->DisplayInvalidLogin();
+	else if(ResponseString.Equals("Nonexistent"))
 		CreateUser();
-	}
 	else
-	{
-		ValidateUserPassComb(Response);
-	}
+		UE_LOG(LogLogin, Error, TEXT("Unexpected response from server: %s"), *ResponseString);
 }
 
 void UTTDatabaseAgent::ScanLeaderboardRequest(UTTLeaderboardWidget* InLeaderboard)
@@ -159,6 +161,18 @@ void UTTDatabaseAgent::ValidateUserPassComb(FHttpResponsePtr Response)
 	}
 }
 
+void UTTDatabaseAgent::ValidateLogin(FString& ResponseString)
+{
+	if(ResponseString == "Success")
+	{
+		SignInMenu->StartGame();
+	}
+	else
+	{
+		SignInMenu->DisplayInvalidLogin();
+	}
+}
+
 void UTTDatabaseAgent::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
 {
 	if(ScanRequest==Request)
@@ -181,8 +195,15 @@ FString UTTDatabaseAgent::EncryptPassword(FString InPassword)
  
 	uint8* Blob; //we declere uint8 pointer
 	uint32 Size; //for size calculation
-
-	for(int i = 0; i <= InPassword.Len() % 3; i++)
+	/** Any number that is not a multiple of 3,
+	 *  can be converted to a multiple of 3
+	 *  by adding a 5 or 10 to it
+	 *  Number + (2 + (3x) * r) = Multiple of 3. Where r is the remainder from Number % 3 and x is any positive integer
+	 *  Idk if there's a name for this. I just spent the last hour
+	 *  figuring that out.
+	 */
+	uint8 Count = InPassword.Len() % 3;
+	for(int i = 0; i < Count; i++)
 	{
 		InPassword.Append("salty");
 	}
@@ -195,9 +216,21 @@ FString UTTDatabaseAgent::EncryptPassword(FString InPassword)
 	Blob = new uint8[Size]; //So once we calculated size we allocating space in memory 
 	//which we use for encryption
 	//We filling allocated space with string to process
+	// TO blob says it uses evenness, tests for multiple of 3 in actuallity.
 	if( FString::ToBlob(InPassword,Blob,InPassword.Len())) {
-		FAES::FAESKey Key;
-		Key.Reset();
+		FString KeyStr = "7x!A%D*G-KaPdSgVkYp3s6v9y/B?E(H+";
+		uint8 Arr[32] = {'a'};
+		FAES::FAESKey Key = FAES::FAESKey();
+		Key.Key[0] = '1';
+		for(int i = 0; i < KeyStr.Len(); i++)
+		{
+			Key.Key[i] = KeyStr[i];
+		}
+		if(!Key.IsValid())
+		{
+			UE_LOG(LogHttp, Error, TEXT("Password Encryption Failed: Key is not valid."))
+			return InPassword;
+		}
 		FAES::EncryptData(Blob,Size,Key); //We encrypt the data, don't know how you want to input key
 		InPassword = FString::FromHexBlob(Blob,Size); //now generate hex string of encrypted data
 		delete Blob; //deleting allocation for safety
@@ -205,7 +238,7 @@ FString UTTDatabaseAgent::EncryptPassword(FString InPassword)
 	}
 	else
 	{
-		UE_LOG(LogHttp, Error, TEXT("Password Encryption Failed!"));
+		UE_LOG(LogHttp, Error, TEXT("Password Encryption Failed: Password cannot be coverted to blob."));
 	}
 	delete Blob; //deleting allocation for safety
 	return ""; //If failed return empty string
