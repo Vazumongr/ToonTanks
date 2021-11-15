@@ -98,13 +98,14 @@ void UTTDatabaseAgent::ScanLeaderboardRequest(UTTLeaderboardWidget* InLeaderboar
 
 void UTTDatabaseAgent::SignInUser(FString& InUsername, FString& InPassword, UTTSignInWidget* InSignInMenu)
 {
+	Password = "";
 	if(InSignInMenu == nullptr)
 		return;
 	SignInMenu = InSignInMenu;
 	Username = InUsername;
 	Password = EncryptPassword(InPassword);
-	
-	FString URL = FString::Printf(TEXT("https://9bkd1wd39i.execute-api.us-east-2.amazonaws.com/users/%s"), *InUsername);
+
+	FString URL = FString::Printf(TEXT("https://9bkd1wd39i.execute-api.us-east-2.amazonaws.com/users/%s/%s"), *InUsername, *Password);
 	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Http->CreateRequest();
 	Request->OnProcessRequestComplete().BindUObject(this, &UTTDatabaseAgent::OnResponseReceived);
 	//This is the url on which to process the request
@@ -189,11 +190,22 @@ void UTTDatabaseAgent::OnResponseReceived(FHttpRequestPtr Request, FHttpResponse
 	}
 }
 
-FString UTTDatabaseAgent::EncryptPassword(FString InPassword)
+FString UTTDatabaseAgent::TempEncryptPassword(FString InPassword)
+{
+	return "";
+}
+
+FString UTTDatabaseAgent::EncryptPassword(FString& InPassword)
 {
 	if(InPassword.IsEmpty()) return InPassword;  //empty string? do nothing
- 
-	uint8* Blob; //we declere uint8 pointer
+	// Found on japanese forum. Works without but keeping here just in case
+	// because I surely don't know what I'm doing
+	//FString SplitSymbol = "EL@$@!";
+	//InPassword.Append(SplitSymbol);
+	
+	// If passwords are 3 chars, it breaks (or i thought. idk anymore. too tired)
+ 	InPassword.Append("salty");
+	
 	uint32 Size; //for size calculation
 	/** Any number that is not a multiple of 3,
 	 *  can be converted to a multiple of 3
@@ -212,27 +224,38 @@ FString UTTDatabaseAgent::EncryptPassword(FString InPassword)
 	//data size need to be aligned with block size
 	Size = InPassword.Len();
 	Size = Size + (FAES::AESBlockSize - (Size % FAES::AESBlockSize));
+
  
-	Blob = new uint8[Size]; //So once we calculated size we allocating space in memory 
-	//which we use for encryption
-	//We filling allocated space with string to process
+	uint8* Blob = new uint8[Size]; //So once we calculated size we allocating space in memory
+
+	FString KeyStr = TEXT("7x!A%D*G-KaPdSgVkYp3s6v9y/B?E(H+");	// the key
+	
+	KeyStr = FMD5::HashAnsiString(*KeyStr);	// saw on forum. Think this might have been part of my issue originally. idk
+	
+	TCHAR *KeyTChar = KeyStr.GetCharArray().GetData();           
+	ANSICHAR *KeyAnsi = (ANSICHAR*)TCHAR_TO_ANSI(KeyTChar);
+	
+	/* Key method sucks. ANSICHAR* ftw
+	FAES::FAESKey Key = FAES::FAESKey();
+	Key.Reset();
+	for(int i = 0; i < KeyStr.Len(); i++)
+	{
+		Key.Key[i] = KeyStr[i];
+	}
+	if(!Key.IsValid())
+	{
+		UE_LOG(LogHttp, Error, TEXT("Password Encryption Failed: Key is not valid."))
+		return InPassword;
+	}
+	*/
 	// TO blob says it uses evenness, tests for multiple of 3 in actuallity.
-	if( FString::ToBlob(InPassword,Blob,InPassword.Len())) {
-		FString KeyStr = "7x!A%D*G-KaPdSgVkYp3s6v9y/B?E(H+";
-		uint8 Arr[32] = {'a'};
-		FAES::FAESKey Key = FAES::FAESKey();
-		Key.Key[0] = '1';
-		for(int i = 0; i < KeyStr.Len(); i++)
-		{
-			Key.Key[i] = KeyStr[i];
-		}
-		if(!Key.IsValid())
-		{
-			UE_LOG(LogHttp, Error, TEXT("Password Encryption Failed: Key is not valid."))
-			return InPassword;
-		}
-		FAES::EncryptData(Blob,Size,Key); //We encrypt the data, don't know how you want to input key
-		InPassword = FString::FromHexBlob(Blob,Size); //now generate hex string of encrypted data
+	// StringToBytes instead of ToBlob because this is working
+	if( StringToBytes(InPassword, Blob, Size)) {
+		
+		FAES::EncryptData(Blob,Size,KeyAnsi); //We encrypt the data
+		InPassword = FString::FromHexBlob(Blob,Size); 
+		InPassword = InPassword.Mid(0,InPassword.Len()/2); // Cut off back half of gibberish
+		//InPassword = FBase64::Encode(Blob,Size); 
 		delete Blob; //deleting allocation for safety
 		return InPassword; //and return it
 	}

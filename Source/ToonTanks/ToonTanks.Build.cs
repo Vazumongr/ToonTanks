@@ -11,6 +11,8 @@ public class ToonTanks : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Http", "Json", "JsonUtilities", "UMG"});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
+		
+		PrivateDefinitions.Add("AES_KEY=1");
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
