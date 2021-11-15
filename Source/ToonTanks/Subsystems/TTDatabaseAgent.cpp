@@ -198,18 +198,17 @@ FString UTTDatabaseAgent::TempEncryptPassword(FString InPassword)
 FString UTTDatabaseAgent::EncryptPassword(FString& InPassword)
 {
 	if(InPassword.IsEmpty()) return InPassword;  //empty string? do nothing
-	// Found on japanese forum. Works without but keeping here just in case
-	// because I surely don't know what I'm doing
+	
+	/** Found on japanese forum. Works without but keeping here just in case
+	 * because I surely don't know what I'm doing
+	 */
 	//FString SplitSymbol = "EL@$@!";
 	//InPassword.Append(SplitSymbol);
 	
 	// If passwords are 3 chars, it breaks (or i thought. idk anymore. too tired)
  	InPassword.Append("salty");
-	
-	uint32 Size; //for size calculation
 	/** Any number that is not a multiple of 3,
-	 *  can be converted to a multiple of 3
-	 *  by adding a 5 or 10 to it
+	 *  can be converted to a multiple of 3 with below formula
 	 *  Number + (2 + (3x) * r) = Multiple of 3. Where r is the remainder from Number % 3 and x is any positive integer
 	 *  Idk if there's a name for this. I just spent the last hour
 	 *  figuring that out.
@@ -219,43 +218,22 @@ FString UTTDatabaseAgent::EncryptPassword(FString& InPassword)
 	{
 		InPassword.Append("salty");
 	}
- 
-	//first we need to calculate the size of array, encrypted data will be processed in blocks so
-	//data size need to be aligned with block size
-	Size = InPassword.Len();
-	Size = Size + (FAES::AESBlockSize - (Size % FAES::AESBlockSize));
 
- 
+	uint32 Size = InPassword.Len();
+	Size = Size + (FAES::AESBlockSize - (Size % FAES::AESBlockSize));
 	uint8* Blob = new uint8[Size]; //So once we calculated size we allocating space in memory
 
 	FString KeyStr = TEXT("7x!A%D*G-KaPdSgVkYp3s6v9y/B?E(H+");	// the key
-	
 	KeyStr = FMD5::HashAnsiString(*KeyStr);	// saw on forum. Think this might have been part of my issue originally. idk
-	
 	TCHAR *KeyTChar = KeyStr.GetCharArray().GetData();           
 	ANSICHAR *KeyAnsi = (ANSICHAR*)TCHAR_TO_ANSI(KeyTChar);
-	
-	/* Key method sucks. ANSICHAR* ftw
-	FAES::FAESKey Key = FAES::FAESKey();
-	Key.Reset();
-	for(int i = 0; i < KeyStr.Len(); i++)
-	{
-		Key.Key[i] = KeyStr[i];
-	}
-	if(!Key.IsValid())
-	{
-		UE_LOG(LogHttp, Error, TEXT("Password Encryption Failed: Key is not valid."))
-		return InPassword;
-	}
-	*/
-	// TO blob says it uses evenness, tests for multiple of 3 in actuallity.
+
 	// StringToBytes instead of ToBlob because this is working
 	if( StringToBytes(InPassword, Blob, Size)) {
 		
 		FAES::EncryptData(Blob,Size,KeyAnsi); //We encrypt the data
 		InPassword = FString::FromHexBlob(Blob,Size); 
 		InPassword = InPassword.Mid(0,InPassword.Len()/2); // Cut off back half of gibberish
-		//InPassword = FBase64::Encode(Blob,Size); 
 		delete Blob; //deleting allocation for safety
 		return InPassword; //and return it
 	}
