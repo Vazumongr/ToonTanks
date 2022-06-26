@@ -31,7 +31,7 @@ void UTTLeaderboardWidget::SortUsersScores()
 {
 	int8 i, j, min_idx;
 	FUserScore temp;
-	for(i = 0; i < UsersScores.Num(); i++)
+	for(i = 0; i < UsersScores.Num() - 1; i++)
 	{
 		min_idx = i;
 		for(j = i+1; j < UsersScores.Num(); j++)
@@ -41,8 +41,8 @@ void UTTLeaderboardWidget::SortUsersScores()
 				min_idx = j;
 			}
 			temp = UsersScores[min_idx];
-			UsersScores[min_idx] = UsersScores[j];
-			UsersScores[j] = temp;
+			UsersScores[min_idx] = UsersScores[i];
+			UsersScores[i] = temp;
 		}
 	}
 }

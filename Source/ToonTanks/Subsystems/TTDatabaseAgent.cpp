@@ -108,7 +108,6 @@ void UTTDatabaseAgent::SignInUser(FString& InUsername, FString& InPassword, UTTS
 	FString URL = FString::Printf(TEXT("https://9bkd1wd39i.execute-api.us-east-2.amazonaws.com/users/%s/%s"), *InUsername, *Password);
 	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Http->CreateRequest();
 	Request->OnProcessRequestComplete().BindUObject(this, &UTTDatabaseAgent::OnResponseReceived);
-	//This is the url on which to process the request
 	Request->SetURL(URL);
 	Request->SetVerb("GET");
 	Request->SetHeader(TEXT("User-Agent"), "X-UnrealEngine-Agent");
@@ -201,9 +200,9 @@ FString UTTDatabaseAgent::EncryptPassword(FString& InPassword)
 	
 	/** Found on japanese forum. Works without but keeping here just in case
 	 * because I surely don't know what I'm doing
-	 */
 	//FString SplitSymbol = "EL@$@!";
 	//InPassword.Append(SplitSymbol);
+	 */
 	
 	// If passwords are 3 chars, it breaks (or i thought. idk anymore. too tired)
  	InPassword.Append("salty");
@@ -237,10 +236,7 @@ FString UTTDatabaseAgent::EncryptPassword(FString& InPassword)
 		delete Blob; //deleting allocation for safety
 		return InPassword; //and return it
 	}
-	else
-	{
-		UE_LOG(LogHttp, Error, TEXT("Password Encryption Failed: Password cannot be coverted to blob."));
-	}
+	UE_LOG(LogHttp, Error, TEXT("Password Encryption Failed: Password cannot be coverted to blob."));
 	delete Blob; //deleting allocation for safety
 	return ""; //If failed return empty string
 }
